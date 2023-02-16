@@ -1,27 +1,71 @@
 package com.kakaotalk.client;
 
 import java.awt.CardLayout;
+import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.net.ConnectException;
+import java.net.Socket;
+import java.net.UnknownHostException;
 
 import javax.imageio.ImageIO;
+import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
-import javax.swing.JTextArea;
 
+import com.google.gson.Gson;
+import com.kakaotalk.clientDto.CreateReqDto;
+import com.kakaotalk.clientDto.RequestDto;
+
+import lombok.Getter;
+
+
+@Getter
 public class KakaoClient extends JFrame {
+	
+	
+	//kakaoClient singleton 생성
+	
+	private static KakaoClient instance;
+	
+	public static KakaoClient getInstance() {
+		
+		if(instance == null) {
+				
+			
+				try {
+					instance = new KakaoClient();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			
+			
+
+		}
+		return instance;
+	}
+	
+	
+	
+	private Socket socket;
+	private Gson gson;
+	private String createroom;
+	
     
     private static final long serialVersionUID = 1L;
     private JPanel loginPanel;
@@ -29,10 +73,30 @@ public class KakaoClient extends JFrame {
     private JPanel chattingPanel;
     private CardLayout cardLayout;
     private JScrollPane userListScroll;
-    private JPanel chattingPanel_1;
     private JTextField messageInput;
+    private JList<String> chattingList;
+	private DefaultListModel<String> chattingListModel;
     
-    public KakaoClient() throws IOException {
+    
+    
+    public static void main(String[] args) {
+    	EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					KakaoClient frame = KakaoClient.getInstance();
+					frame.setVisible(true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+    
+    
+    private KakaoClient() throws IOException {
+    	
+    	gson = new Gson();
+    	
         setResizable(false);
         setTitle("KakaoTalk");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -40,7 +104,6 @@ public class KakaoClient extends JFrame {
         
         // 배경화면 이미지를 불러옵니다.
         final BufferedImage loginImg = ImageIO.read(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakao.png"));
-        final ImageIcon login_Button = new ImageIcon("/image/kakao_login_medium_narrow.png");
         final ImageIcon loginButtonImg = new ImageIcon(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakao_login_medium_narrow.png"));
         final ImageIcon chattingPlusButtonImg = new ImageIcon(KakaoClient.class.getResource("/com/kakaotalk/client/images/plus2.png"));
         final BufferedImage chattingImg = ImageIO.read(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakaoChatting.png"));
@@ -49,7 +112,7 @@ public class KakaoClient extends JFrame {
         
         
         
-        
+   
         
         // 커스텀 JPanel 클래스를 생성합니다.
         JPanel mainPanel = new JPanel() {
@@ -72,6 +135,8 @@ public class KakaoClient extends JFrame {
             }
         };
         
+     
+        
         
         setContentPane(mainPanel);
         mainPanel.setLayout(new CardLayout(0, 0));
@@ -90,9 +155,7 @@ public class KakaoClient extends JFrame {
         userNameField.setColumns(10);
         
         JButton loginButton = new JButton(loginButtonImg);
-//        loginButton.addMouseListener(new MouseAdapter() {
-//           
-//        });
+        
         loginButton.setBounds(101, 486, 256, 47);
         loginButton.setBorderPainted(true);
         loginButton.setContentAreaFilled(false);
@@ -100,24 +163,60 @@ public class KakaoClient extends JFrame {
         loginButton.setRolloverIcon(loginButtonImg);
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
-                // 로그인 버튼을 클릭했을 때, chattingPanel을 보여줍니다.
-                cardLayout.show(mainPanel, "chattingPanel");
+            	
+            	
+                
+      
+                cardLayout.show(mainPanel, "createPanel");
             }
         });
         loginPanel.add(loginButton);
         
-        chattingPanel_1 = new JPanel();
-        mainPanel.add(createPanel, "chattingPanel");
+        chattingPanel = new JPanel();
+        mainPanel.add(createPanel, "createPanel");
         createPanel.setLayout(null);
         
         JScrollPane chattingListScroll = new JScrollPane();
         chattingListScroll.setBounds(101, 112, 308, 602);
         createPanel.add(chattingListScroll);
         
-        JList chattingList = new JList();
-        chattingListScroll.setViewportView(chattingList);
+        
+        chattingListModel = new DefaultListModel<>();
+        chattingList = new JList<String>(chattingListModel);
+		chattingListScroll.setViewportView(chattingList); 
+
         
         JButton chPlusButton = new JButton();
+        chPlusButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		
+       
+	try {
+		   createroom =JOptionPane.showInputDialog(null,
+				   "방의 제목을 입력하시오.","방 생성",
+				   JOptionPane.INFORMATION_MESSAGE);
+	       CreateReqDto createReqDto = new CreateReqDto(createroom);
+		   String createReqDtoJson = gson.toJson(createReqDto);
+		   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
+		   String requestDtoJson = gson.toJson(requestDto);	
+		   OutputStream outputStream = socket.getOutputStream();
+		   PrintWriter out = new PrintWriter(outputStream,true);
+		   out.println(requestDtoJson);
+	} catch (ConnectException e1) {
+		
+		JOptionPane.showMessageDialog(null, 
+				"서버 접속 실패" , 
+				"접속실패",
+				JOptionPane.ERROR_MESSAGE);
+	}catch (UnknownHostException e1) {
+		e1.printStackTrace();
+	}catch (IOException e1) {
+		e1.printStackTrace();
+	}
+  }
+});
+        
+        
         chPlusButton.setBounds(26, 92, 50, 50);
         chPlusButton.setIcon(chattingPlusButtonImg);
         loginButton.setBorderPainted(true);
@@ -144,28 +243,28 @@ public class KakaoClient extends JFrame {
         messageScroll.setViewportView(messageInput);
         messageInput.setColumns(10);
         
-        JButton sendButton = new JButton("New button");
-        sendButton.setBounds(397, 675, 55, 76);
+        JButton sendButton = new JButton();
+        sendButton.setIcon(enterButtonImg);
+        sendButton.setBounds(397, 689, 50, 50);
+        sendButton.setBorderPainted(true);
+        sendButton.setContentAreaFilled(false);
+        sendButton.setFocusPainted(false);
         chatPanel.add(sendButton);
         
-        JButton exitButton = new JButton("New button");
-        exitButton.setBounds(386, 10, 66, 56);
+        JButton exitButton = new JButton();
+        exitButton.setIcon(exitButtonImg);
+        exitButton.setBounds(386, 10, 50, 50);
+        exitButton.setBorderPainted(true);
+        exitButton.setContentAreaFilled(false);
+        exitButton.setFocusPainted(false);
         chatPanel.add(exitButton);
-        chattingPanel_1.setLayout(null);
+        chattingPanel.setLayout(null);
         
         userListScroll = new JScrollPane();
         userListScroll.setBounds(454, 706, -359, -699);
-        chattingPanel_1.add(userListScroll);
+        chattingPanel.add(userListScroll);
         
         setVisible(true);
     }
     
-    public static void main(String[] args) {
-		try {
-			new KakaoClient();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
 }
