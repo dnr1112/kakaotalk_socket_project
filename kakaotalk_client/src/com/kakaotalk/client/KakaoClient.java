@@ -29,6 +29,7 @@ import javax.swing.SwingConstants;
 
 import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
+import com.kakaotalk.clientDto.JoinReqDto;
 import com.kakaotalk.clientDto.RequestDto;
 
 import lombok.Getter;
@@ -64,6 +65,7 @@ public class KakaoClient extends JFrame {
 	
 	private Socket socket;
 	private Gson gson;
+	private String username;
 	private String createroom;
 	
     
@@ -164,8 +166,19 @@ public class KakaoClient extends JFrame {
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	
-            	
-                
+            	username = userNameField.getText();
+            	JoinReqDto joinReqDto = new JoinReqDto(username);
+				String joinReqDtoJson = gson.toJson(joinReqDto);
+				RequestDto requestDto = new RequestDto("join", joinReqDtoJson);
+				String requestDtoJson = gson.toJson(requestDto);
+				JOptionPane.showMessageDialog(null, 
+						username + "님 접속을 환영합니다." , 
+						"접속성공",
+						JOptionPane.INFORMATION_MESSAGE);
+				
+				
+				
+				
       
                 cardLayout.show(mainPanel, "createPanel");
             }
@@ -189,7 +202,6 @@ public class KakaoClient extends JFrame {
         JButton chPlusButton = new JButton();
         chPlusButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
-        		
        
 	try {
 		   createroom =JOptionPane.showInputDialog(null,
