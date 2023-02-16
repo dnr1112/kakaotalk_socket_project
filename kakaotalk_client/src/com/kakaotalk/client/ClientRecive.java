@@ -8,9 +8,11 @@ import java.net.Socket;
 
 import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateRespDto;
+import com.kakaotalk.clientDto.JoinRespDto;
 import com.kakaotalk.clientDto.ResponseDto;
 
 import lombok.RequiredArgsConstructor;
+
 
 
 @RequiredArgsConstructor
@@ -35,6 +37,13 @@ public class ClientRecive extends Thread {
 					ResponseDto responseDto = gson.fromJson(request, ResponseDto.class);
 					
 					switch (responseDto.getResource()) {
+					
+						case "join" :
+							JoinRespDto joinRespDto = gson.fromJson(responseDto.getBody(), JoinRespDto.class);
+							
+							//ChattingClient.
+							
+							break;
 					
 						case "create" :
 								CreateRespDto createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
