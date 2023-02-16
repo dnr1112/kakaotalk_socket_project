@@ -39,12 +39,13 @@ public class KakaoClient extends JFrame {
         setBounds(100, 100, 480, 800);
         
         // 배경화면 이미지를 불러옵니다.
-        final BufferedImage login_img = ImageIO.read(new File("C:\\junil\\AWS_LKY\\workspace\\AWS_JAVA\\src\\kakaotalk\\image\\kakao.png"));
-        final ImageIcon login_Button = new ImageIcon("C:\\junil\\AWS_LKY\\workspace\\AWS_JAVA\\src\\kakaotalk\\image\\kakao_login_medium_narrow.png");
-        final ImageIcon chattingPlusButton = new ImageIcon("C:\\junil\\AWS_LKY\\workspace\\AWS_JAVA\\src\\kakaotalk\\image\\plus2.png");
-        final BufferedImage chatting_img = ImageIO.read(new File("C:\\junil\\AWS_LKY\\workspace\\AWS_JAVA\\src\\kakaotalk\\image\\kakaoChatting.png"));
-        final ImageIcon enter_Button = new ImageIcon("C:\\junil\\AWS_LKY\\workspace\\AWS_JAVA\\src\\kakaotalk\\image\\Enter.png");
-        final ImageIcon exit_Button = new ImageIcon("C:\\junil\\AWS_LKY\\workspace\\AWS_JAVA\\src\\kakaotalk\\image\\Exit.png");
+        final BufferedImage loginImg = ImageIO.read(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakao.png"));
+        final ImageIcon login_Button = new ImageIcon("/image/kakao_login_medium_narrow.png");
+        final ImageIcon loginButtonImg = new ImageIcon(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakao_login_medium_narrow.png"));
+        final ImageIcon chattingPlusButtonImg = new ImageIcon(KakaoClient.class.getResource("/com/kakaotalk/client/images/plus2.png"));
+        final BufferedImage chattingImg = ImageIO.read(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakaoChatting.png"));
+        final ImageIcon enterButtonImg = new ImageIcon(KakaoClient.class.getResource("/com/kakaotalk/client/images/Enter.png"));
+        final ImageIcon exitButtonImg = new ImageIcon(KakaoClient.class.getResource("/com/kakaotalk/client/images/Exit.png"));
         
         
         
@@ -57,7 +58,7 @@ public class KakaoClient extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(login_img, 0, 0, getWidth(), getHeight(), null);
+                g.drawImage(loginImg, 0, 0, getWidth(), getHeight(), null);
             }
         };
         
@@ -67,7 +68,7 @@ public class KakaoClient extends JFrame {
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(chatting_img, 0, 0, getWidth(), getHeight(), null);
+                g.drawImage(chattingImg, 0, 0, getWidth(), getHeight(), null);
             }
         };
         
@@ -88,7 +89,7 @@ public class KakaoClient extends JFrame {
         loginPanel.add(userNameField);
         userNameField.setColumns(10);
         
-        JButton loginButton = new JButton(login_Button);
+        JButton loginButton = new JButton(loginButtonImg);
 //        loginButton.addMouseListener(new MouseAdapter() {
 //           
 //        });
@@ -96,7 +97,7 @@ public class KakaoClient extends JFrame {
         loginButton.setBorderPainted(true);
         loginButton.setContentAreaFilled(false);
         loginButton.setFocusPainted(false);
-        loginButton.setRolloverIcon(login_Button);
+        loginButton.setRolloverIcon(loginButtonImg);
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
                 // 로그인 버튼을 클릭했을 때, chattingPanel을 보여줍니다.
@@ -116,8 +117,9 @@ public class KakaoClient extends JFrame {
         JList chattingList = new JList();
         chattingListScroll.setViewportView(chattingList);
         
-        JButton chPlusButton = new JButton(chattingPlusButton);
+        JButton chPlusButton = new JButton();
         chPlusButton.setBounds(26, 92, 50, 50);
+        chPlusButton.setIcon(chattingPlusButtonImg);
         loginButton.setBorderPainted(true);
         loginButton.setContentAreaFilled(false);
         loginButton.setFocusPainted(false);
@@ -159,10 +161,11 @@ public class KakaoClient extends JFrame {
     }
     
     public static void main(String[] args) {
-        try {
-         new KakaoClient();
-      } catch (IOException e) {
-         e.printStackTrace();
-      }
-    }
+		try {
+			new KakaoClient();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
