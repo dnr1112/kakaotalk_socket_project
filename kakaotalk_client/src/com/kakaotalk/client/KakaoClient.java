@@ -30,9 +30,11 @@ import javax.swing.SwingConstants;
 import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
 import com.kakaotalk.clientDto.JoinReqDto;
+import com.kakaotalk.clientDto.MessageReqDto;
 import com.kakaotalk.clientDto.RequestDto;
 
 import lombok.Getter;
+
 
 
 @Getter
@@ -54,9 +56,6 @@ public class KakaoClient extends JFrame {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-			
-			
-
 		}
 		return instance;
 	}
@@ -74,8 +73,9 @@ public class KakaoClient extends JFrame {
     private JTextField userNameField;
     private JPanel chattingPanel;
     private CardLayout cardLayout;
-    private JScrollPane userListScroll;
     private JTextField messageInput;
+    private JList<String> userList;
+    private DefaultListModel<String> userListModel;
     private JList<String> chattingList;
 	private DefaultListModel<String> chattingListModel;
     
@@ -166,21 +166,43 @@ public class KakaoClient extends JFrame {
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	
-            	username = userNameField.getText();
-            	JoinReqDto joinReqDto = new JoinReqDto(username);
-				String joinReqDtoJson = gson.toJson(joinReqDto);
-				RequestDto requestDto = new RequestDto("join", joinReqDtoJson);
-				String requestDtoJson = gson.toJson(requestDto);
-				JOptionPane.showMessageDialog(null, 
-						username + "님 접속을 환영합니다." , 
-						"접속성공",
-						JOptionPane.INFORMATION_MESSAGE);
-				
-				
-				
-				
-      
-                cardLayout.show(mainPanel, "createPanel");
+            	String ip = "127.0.0.1";
+            	int port = 9090;
+            	
+            	try {
+					socket = new Socket(ip,port);
+					ClientRecive clientRecive = new ClientRecive(socket);
+					clientRecive.start();
+					username = userNameField.getText();
+	          
+					JOptionPane.showMessageDialog(null, 
+							username + "님 접속을 환영합니다." , 
+							"접속성공",
+							JOptionPane.INFORMATION_MESSAGE);  
+	                cardLayout.show(mainPanel, "createPanel");
+	                JoinReqDto joinReqDto = new JoinReqDto(username);
+					String joinReqDtoJson = gson.toJson(joinReqDto);
+					RequestDto requestDto = new RequestDto("join", joinReqDtoJson);
+					String requestDtoJson = gson.toJson(requestDto);
+					OutputStream outputStream = socket.getOutputStream();
+					PrintWriter out = new PrintWriter(outputStream,true);
+					out.println(requestDtoJson);
+				}catch (ConnectException e1) {
+					
+					JOptionPane.showMessageDialog(null, 
+							"서버 접속 실패" , 
+							"접속실패",
+							JOptionPane.ERROR_MESSAGE);
+            	}catch (UnknownHostException e1) {
+					
+					e1.printStackTrace();
+				} catch (IOException e1) {
+					
+					e1.printStackTrace();
+				}
+            	
+            	
+          
             }
         });
         loginPanel.add(loginButton);
@@ -211,14 +233,15 @@ public class KakaoClient extends JFrame {
 		   String createReqDtoJson = gson.toJson(createReqDto);
 		   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
 		   String requestDtoJson = gson.toJson(requestDto);	
+		   
 		   OutputStream outputStream = socket.getOutputStream();
 		   PrintWriter out = new PrintWriter(outputStream,true);
 		   out.println(requestDtoJson);
 	} catch (ConnectException e1) {
 		
 		JOptionPane.showMessageDialog(null, 
-				"서버 접속 실패" , 
-				"접속실패",
+				"방 생성 실패" , 
+				"생성 실패",
 				JOptionPane.ERROR_MESSAGE);
 	}catch (UnknownHostException e1) {
 		e1.printStackTrace();
@@ -235,6 +258,15 @@ public class KakaoClient extends JFrame {
         loginButton.setContentAreaFilled(false);
         loginButton.setFocusPainted(false);
         createPanel.add(chPlusButton);
+        
+        JScrollPane userListScroll = new JScrollPane();
+        userListScroll.setBounds(101, 42, 308, 60);
+        createPanel.add(userListScroll);
+        
+        
+        userListModel = new DefaultListModel<>();
+		userList = new JList<String>(userListModel);
+		userListScroll.setViewportView(userList);
         
         JPanel chatPanel = new JPanel();
         mainPanel.add(chatPanel, "name_2765926546827100");
@@ -272,11 +304,6 @@ public class KakaoClient extends JFrame {
         chatPanel.add(exitButton);
         chattingPanel.setLayout(null);
         
-        userListScroll = new JScrollPane();
-        userListScroll.setBounds(454, 706, -359, -699);
-        chattingPanel.add(userListScroll);
         
-        setVisible(true);
     }
-    
 }
