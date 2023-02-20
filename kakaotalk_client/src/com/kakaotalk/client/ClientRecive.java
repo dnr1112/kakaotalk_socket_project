@@ -25,6 +25,7 @@ public class ClientRecive extends Thread {
 	private final Socket socket;
 	private InputStream inputStream;
 	private Gson gson;
+	private static CreateRespDto createRespDto;
 
 	
 		 @Override
@@ -39,14 +40,12 @@ public class ClientRecive extends Thread {
 					
 					String request = in.readLine();
 					ResponseDto responseDto = gson.fromJson(request, ResponseDto.class);
-					
 					switch (responseDto.getResource()) {
 						
 						case "join" :
-							
 								JoinRespDto joinRespDto = gson.fromJson(responseDto.getBody(), JoinRespDto.class);
 								KakaoClient.getInstance().getUserListModel().clear();
-								KakaoClient.getInstance().getUserListModel().size();
+								//KakaoClient.getInstance().getUserListModel().size();
 								KakaoClient.getInstance().getUserListModel().addElement("접속한 유저 현황"+"("+joinRespDto.getConnectedUsers().size()+"명)");
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
 								//KakaoClient.getInstance().getUserList().setSelectedIndex(0);
@@ -54,7 +53,7 @@ public class ClientRecive extends Thread {
 								break;
 					
 						case "create" :
-								CreateRespDto createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
+								createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
 								KakaoClient.getInstance().getChattingListModel().clear();
 								KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅창 목록 ---");
 								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getConnectedRooms());
