@@ -50,6 +50,10 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
 								//KakaoClient.getInstance().getUserList().setSelectedIndex(0);
 								//append(joinRespDto.getWelcomeMessage()+"\n");
+								createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
+								KakaoClient.getInstance().getChattingListModel().clear();
+								KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅창 목록 ---");
+								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getConnectedRooms());
 								break;
 					
 						case "create" :
