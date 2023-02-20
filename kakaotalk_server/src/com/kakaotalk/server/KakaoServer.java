@@ -26,11 +26,11 @@ import lombok.Data;
 @Data
 class ConnectedSocket extends Thread{
 	private static List<ConnectedSocket> socketListUsers = new ArrayList<>();
-	private static List<ConnectedSocket> socketListCreate = new ArrayList<>();
+	//private static List<ConnectedSocket> socketListCreate = new ArrayList<>();
+	private static List<String> connectedChatting = new ArrayList<>();
 	private Socket socket;
 
 	
-
 	private InputStream inputStream;
 	private OutputStream outputStream;
 
@@ -43,7 +43,7 @@ class ConnectedSocket extends Thread{
 		this.socket = socket;
 		gson = new Gson(); // gson 생성
 		socketListUsers.add(this);
-		socketListCreate.add(this);
+		//socketListCreate.add(this);
 	}
 	
 	@Override
@@ -66,20 +66,17 @@ class ConnectedSocket extends Thread{
 						connectedUsers.add(connectedSocket.getUsername());
 						}
 						//여기.....
-						System.out.println("connectedUsers: " + connectedUsers);
-						System.out.println("UserCounts: " + connectedUsers.size());
+						//System.out.println("connectedUsers: " + connectedUsers);
+						//System.out.println("UserCounts: " + connectedUsers.size());
 						JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
 						break;
 					case "create" : 
 						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
 						chattingname = createReqDto.getCreateRoom();
-						List<String> connectedChatting = new ArrayList<>();
-						for(ConnectedSocket connectedSocket : socketListCreate) {
-						connectedChatting.add(connectedSocket.getChattingname());
-						}
-						System.out.println("chattingname: " + connectedChatting);
-						System.out.println("RoomCounts: " + connectedChatting.size());
+						connectedChatting.add(chattingname);
+						//System.out.println("chattingname: " + connectedChatting);
+						//System.out.println("RoomCounts: " + connectedChatting.size());
 						CreateRespDto createRespDto = new CreateRespDto(connectedChatting);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto));
 						break;
