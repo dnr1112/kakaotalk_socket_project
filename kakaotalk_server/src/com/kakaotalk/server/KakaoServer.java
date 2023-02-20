@@ -71,6 +71,8 @@ class ConnectedSocket extends Thread{
 						//System.out.println("UserCounts: " + connectedUsers.size());
 						JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
+						CreateRespDto createRespDto1 = new CreateRespDto(connectedChatting);
+		                sendToAll("create", "ok",gson.toJson(createRespDto1));
 						break;
 					case "create" : 
 						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
@@ -78,8 +80,8 @@ class ConnectedSocket extends Thread{
 						connectedChatting.add(chattingname);
 						//System.out.println("chattingname: " + connectedChatting);
 						//System.out.println("RoomCounts: " + connectedChatting.size());
-						CreateRespDto createRespDto = new CreateRespDto(connectedChatting);
-						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto));
+						CreateRespDto createRespDto2 = new CreateRespDto(connectedChatting);
+						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto2));
 						break;
 					case "sendMessage":
 						

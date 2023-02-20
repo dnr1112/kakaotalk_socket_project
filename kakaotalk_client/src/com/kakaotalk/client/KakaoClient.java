@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -29,11 +31,8 @@ import javax.swing.SwingConstants;
 
 import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
-import com.kakaotalk.clientDto.CreateRespDto;
 import com.kakaotalk.clientDto.JoinReqDto;
-import com.kakaotalk.clientDto.MessageReqDto;
 import com.kakaotalk.clientDto.RequestDto;
-import com.kakaotalk.clientDto.ResponseDto;
 
 import lombok.Getter;
 
@@ -41,8 +40,7 @@ import lombok.Getter;
 
 @Getter
 public class KakaoClient extends JFrame {
-	
-	
+
 	//kakaoClient singleton 생성
 	
 	private static KakaoClient instance;
@@ -50,8 +48,6 @@ public class KakaoClient extends JFrame {
 	public static KakaoClient getInstance() {
 		
 		if(instance == null) {
-				
-			
 				try {
 					instance = new KakaoClient();
 				} catch (IOException e) {
@@ -72,10 +68,13 @@ public class KakaoClient extends JFrame {
     
     private static final long serialVersionUID = 1L;
     private JPanel loginPanel;
-    private JTextField userNameField;
-    private JPanel chattingPanel;
+    private JPanel createPanel;
+    private JPanel chatPanel;
     private CardLayout cardLayout;
+    
+    private JTextField userNameField;
     private JTextField messageInput;
+    
     private JList<String> userList;
     private DefaultListModel<String> userListModel;
     private JList<String> chattingList;
@@ -129,6 +128,25 @@ public class KakaoClient extends JFrame {
             }
         };
         
+        setContentPane(mainPanel);
+        mainPanel.setLayout(new CardLayout(0, 0));
+        cardLayout = (CardLayout) mainPanel.getLayout();
+        
+        JPanel loginPanel = new JPanel() {
+            private static final long serialVersionUID = 1L;
+
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(chattingImg, 0, 0, getWidth(), getHeight(), null);
+            }
+        };
+        
+    	loginPanel = new JPanel();
+        loginPanel.setOpaque(false);
+        mainPanel.add(loginPanel, "loginPanel");
+        loginPanel.setLayout(null);
+        
         JPanel createPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
 
@@ -139,17 +157,27 @@ public class KakaoClient extends JFrame {
             }
         };
         
+//        createPanel = new JPanel();
+//        createPanel.setOpaque(false);
+//        mainPanel.add(createPanel, "createPanel");
+//        createPanel.setLayout(null);
+               
+        JPanel chatPanel = new JPanel() {
+            private static final long serialVersionUID = 1L;
+            
+            @Override
+            protected void paintComponent(Graphics g) {
+               // super.paintComponent(g);
+               // g.drawImage(chattingImg, 0, 0, getWidth(), getHeight(), null);
+            }
+        };
+        
+        chatPanel = new JPanel();
+        chatPanel.setOpaque(false);
+        mainPanel.add(createPanel, "createPanel");
+        createPanel.setLayout(null);
      
-        
-        
-        setContentPane(mainPanel);
-        mainPanel.setLayout(new CardLayout(0, 0));
-        cardLayout = (CardLayout) mainPanel.getLayout();
-        
-        loginPanel = new JPanel();
-        loginPanel.setOpaque(false);
-        mainPanel.add(loginPanel, "loginPanel");
-        loginPanel.setLayout(null);
+   
         
         userNameField = new JTextField();
         userNameField.setFont(new Font("맑은 고딕", Font.BOLD, 15));
@@ -165,6 +193,7 @@ public class KakaoClient extends JFrame {
         loginButton.setContentAreaFilled(false);
         loginButton.setFocusPainted(false);
         loginButton.setRolloverIcon(loginButtonImg);
+        loginPanel.add(loginButton);
         loginButton.addActionListener(new ActionListener() {
             public void actionPerformed(ActionEvent e) {
             	
@@ -207,21 +236,10 @@ public class KakaoClient extends JFrame {
           
             }
         });
-        loginPanel.add(loginButton);
-        
-        chattingPanel = new JPanel();
-        mainPanel.add(createPanel, "createPanel");
-        createPanel.setLayout(null);
         
         JScrollPane chattingListScroll = new JScrollPane();
         chattingListScroll.setBounds(101, 112, 308, 602);
         createPanel.add(chattingListScroll);
-        
-        
-        chattingListModel = new DefaultListModel<>();
-        chattingList = new JList<String>(chattingListModel);
-		chattingListScroll.setViewportView(chattingList); 
-
         
         JButton chPlusButton = new JButton();
         chPlusButton.addActionListener(new ActionListener() {
@@ -253,6 +271,28 @@ public class KakaoClient extends JFrame {
 });
         
         
+        chattingListModel = new DefaultListModel<>();
+        chattingList = new JList<String>(chattingListModel);
+		chattingListScroll.setViewportView(chattingList); 
+		
+		
+		
+		chattingList.addMouseListener(new MouseAdapter() {
+		    public void mouseClicked(MouseEvent e) {
+		    	
+		    	int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
+		    	 if (choice == JOptionPane.YES_OPTION) {
+		    		 System.out.println("넘어가.");
+		             cardLayout.show(mainPanel, "chatPanel");
+		         } else {
+		             // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
+		         }
+	            	//cardLayout.show(createPanel, "chatPanel");
+	          }
+				
+			});
+		
+
         chPlusButton.setBounds(26, 92, 50, 50);
         chPlusButton.setIcon(chattingPlusButtonImg);
         loginButton.setBorderPainted(true);
@@ -269,8 +309,8 @@ public class KakaoClient extends JFrame {
 		userList = new JList<String>(userListModel);
 		userListScroll.setViewportView(userList);
         
-        JPanel chatPanel = new JPanel();
-        mainPanel.add(chatPanel, "name_2765926546827100");
+        //JPanel chatPanel = new JPanel();
+        mainPanel.add(chatPanel, "chatPanel");
         chatPanel.setLayout(null);
         
         JScrollPane contentScroll = new JScrollPane();
@@ -303,7 +343,7 @@ public class KakaoClient extends JFrame {
         exitButton.setContentAreaFilled(false);
         exitButton.setFocusPainted(false);
         chatPanel.add(exitButton);
-        chattingPanel.setLayout(null);
+        chatPanel.setLayout(null);
         
         
     }
