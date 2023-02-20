@@ -28,8 +28,12 @@ class ConnectedSocket extends Thread{
 	private static List<ConnectedSocket> socketListUsers = new ArrayList<>();
 	private static List<ConnectedSocket> socketListCreate = new ArrayList<>();
 	private Socket socket;
+
+	
+
 	private InputStream inputStream;
 	private OutputStream outputStream;
+
 	private Gson gson;
 	
 	private String username;
@@ -48,6 +52,7 @@ class ConnectedSocket extends Thread{
 			inputStream = socket.getInputStream();  // 들어올 문을 열어줌
 			BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 			
+			
 			while(true) {
 				String request = in.readLine();  // requestDto(JSON) 
 				RequestDto requestDto = gson.fromJson(request, RequestDto.class);
@@ -62,6 +67,7 @@ class ConnectedSocket extends Thread{
 						}
 						//여기.....
 						System.out.println("connectedUsers: " + connectedUsers);
+						System.out.println("UserCounts: " + connectedUsers.size());
 						JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
 						break;
@@ -70,8 +76,10 @@ class ConnectedSocket extends Thread{
 						chattingname = createReqDto.getCreateRoom();
 						List<String> connectedChatting = new ArrayList<>();
 						for(ConnectedSocket connectedSocket : socketListCreate) {
-							connectedChatting.add(connectedSocket.getChattingname());
+						connectedChatting.add(connectedSocket.getChattingname());
 						}
+						System.out.println("chattingname: " + connectedChatting);
+						System.out.println("RoomCounts: " + connectedChatting.size());
 						CreateRespDto createRespDto = new CreateRespDto(connectedChatting);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto));
 						break;
@@ -86,11 +94,8 @@ class ConnectedSocket extends Thread{
 						}else {
 							String message = messageReqDto.getFromUser() + "[" + messageReqDto.getToUser() + "]: " + messageReqDto.getMessageValue();
 							MessageRespDto messageRespDto = new MessageRespDto(message);
-							sendToUser(requestDto.getResource(), "ok", gson.toJson(messageRespDto),messageReqDto.getToUser());
-							
-							
+							sendToUser(requestDto.getResource(), "ok", gson.toJson(messageRespDto),messageReqDto.getToUser());	
 						}
-					
 						break;
 				}
 			}

@@ -233,7 +233,6 @@ public class KakaoClient extends JFrame {
 		   String createReqDtoJson = gson.toJson(createReqDto);
 		   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
 		   String requestDtoJson = gson.toJson(requestDto);	
-		   
 		   OutputStream outputStream = socket.getOutputStream();
 		   PrintWriter out = new PrintWriter(outputStream,true);
 		   out.println(requestDtoJson);
