@@ -6,6 +6,8 @@ import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
@@ -32,6 +34,7 @@ import javax.swing.SwingConstants;
 import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
 import com.kakaotalk.clientDto.JoinReqDto;
+import com.kakaotalk.clientDto.MessageReqDto;
 import com.kakaotalk.clientDto.RequestDto;
 
 import lombok.Getter;
@@ -74,6 +77,8 @@ public class KakaoClient extends JFrame {
     
     private JTextField userNameField;
     private JTextField messageInput;
+    
+    private JTextArea contentView;
     
     private JList<String> userList;
     private DefaultListModel<String> userListModel;
@@ -157,10 +162,10 @@ public class KakaoClient extends JFrame {
             }
         };
         
-//        createPanel = new JPanel();
-//        createPanel.setOpaque(false);
-//        mainPanel.add(createPanel, "createPanel");
-//        createPanel.setLayout(null);
+        createPanel = new JPanel();
+        createPanel.setOpaque(false);
+        mainPanel.add(createPanel, "createPanel");
+        createPanel.setLayout(null);
                
         JPanel chatPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
@@ -282,7 +287,6 @@ public class KakaoClient extends JFrame {
 		    	
 		    	int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
 		    	 if (choice == JOptionPane.YES_OPTION) {
-		    		 System.out.println("넘어가.");
 		             cardLayout.show(mainPanel, "chatPanel");
 		         } else {
 		             // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
@@ -317,7 +321,7 @@ public class KakaoClient extends JFrame {
         contentScroll.setBounds(0, 76, 464, 577);
         chatPanel.add(contentScroll);
         
-        JTextArea contentView = new JTextArea();
+        contentView = new JTextArea();
         contentScroll.setViewportView(contentView);
         
         JScrollPane messageScroll = new JScrollPane();
@@ -325,10 +329,28 @@ public class KakaoClient extends JFrame {
         chatPanel.add(messageScroll);
         
         messageInput = new JTextField();
+        messageInput.setHorizontalAlignment(SwingConstants.LEFT);
+        messageInput.addKeyListener(new KeyAdapter() {
+			@Override
+			public void keyPressed(KeyEvent e) {
+				
+				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+			
+						sendMessage();
+				}
+				
+			}
+		});
         messageScroll.setViewportView(messageInput);
         messageInput.setColumns(10);
         
         JButton sendButton = new JButton();
+        sendButton.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		sendMessage();
+        	}
+        });
         sendButton.setIcon(enterButtonImg);
         sendButton.setBounds(397, 689, 50, 50);
         sendButton.setBorderPainted(true);
@@ -337,6 +359,12 @@ public class KakaoClient extends JFrame {
         chatPanel.add(sendButton);
         
         JButton exitButton = new JButton();
+        exitButton.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		cardLayout.show(mainPanel, "createPanel");
+        	}
+        });
         exitButton.setIcon(exitButtonImg);
         exitButton.setBounds(386, 10, 50, 50);
         exitButton.setBorderPainted(true);
@@ -347,4 +375,33 @@ public class KakaoClient extends JFrame {
         
         
     }
+    
+    private void sendRequest(String resouce, String body) {
+		OutputStream outputStream;
+		try {
+			outputStream = socket.getOutputStream();
+			PrintWriter out = new PrintWriter(outputStream,true);
+			RequestDto requestDto = new RequestDto(resouce, body);
+		
+			out.println(gson.toJson(requestDto));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	
+	private void sendMessage() {
+		if(!messageInput.getText().isBlank()) { 
+			
+				String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
+				
+				MessageReqDto messageReqDto =
+						new MessageReqDto(toUser, username, messageInput.getText());
+				
+				sendRequest("sendMessage", gson.toJson(messageReqDto));
+				System.out.println(messageReqDto);
+				messageInput.setText("");
+				
+		  }
+	}
 }
