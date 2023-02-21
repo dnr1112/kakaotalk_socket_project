@@ -63,7 +63,7 @@ public class ClientRecive extends Thread {
 								break;
 						case "sendMessage" :
 								MessageRespDto messageRespDto = gson.fromJson(responseDto.getBody(),MessageRespDto.class);
-								//KakaoClient.getInstance().getWelcomeView().append(messageRespDto.getMessageValue()+ "\n");
+								KakaoClient.getInstance().getContentView().append(messageRespDto.getMessageValue()+ "\n");
 					
 					}
 					
