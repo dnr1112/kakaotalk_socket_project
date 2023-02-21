@@ -35,6 +35,7 @@ import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
 import com.kakaotalk.clientDto.JoinReqDto;
 import com.kakaotalk.clientDto.MessageReqDto;
+import com.kakaotalk.clientDto.MessageRespDto;
 import com.kakaotalk.clientDto.RequestDto;
 
 import lombok.Getter;
@@ -147,11 +148,14 @@ public class KakaoClient extends JFrame {
             }
         };
         
+        // 로그인 화면
     	loginPanel = new JPanel();
         loginPanel.setOpaque(false);
         mainPanel.add(loginPanel, "loginPanel");
         loginPanel.setLayout(null);
         
+        
+        // 방만들기 화면
         JPanel createPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
 
@@ -162,25 +166,26 @@ public class KakaoClient extends JFrame {
             }
         };
         
-        createPanel = new JPanel();
+        //createPanel = new JPanel();
         createPanel.setOpaque(false);
         mainPanel.add(createPanel, "createPanel");
         createPanel.setLayout(null);
-               
+          
+        // 채팅 화면
         JPanel chatPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
             
             @Override
             protected void paintComponent(Graphics g) {
-               // super.paintComponent(g);
+                super.paintComponent(g);
                // g.drawImage(chattingImg, 0, 0, getWidth(), getHeight(), null);
             }
         };
         
-        chatPanel = new JPanel();
+        //chatPanel = new JPanel();
         chatPanel.setOpaque(false);
         mainPanel.add(createPanel, "createPanel");
-        createPanel.setLayout(null);
+        chatPanel.setLayout(null);
      
    
         
@@ -283,18 +288,20 @@ public class KakaoClient extends JFrame {
 		
 		
 		chattingList.addMouseListener(new MouseAdapter() {
-		    public void mouseClicked(MouseEvent e) {
-		    	
-		    	int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
-		    	 if (choice == JOptionPane.YES_OPTION) {
-		             cardLayout.show(mainPanel, "chatPanel");
-		         } else {
-		             // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
-		         }
-	            	//cardLayout.show(createPanel, "chatPanel");
-	          }
-				
-			});
+			public void mouseClicked(MouseEvent e) {
+		        int selectedIdx = chattingList.getSelectedIndex();
+		        String selectedRoom = (String) chattingList.getModel().getElementAt(selectedIdx);
+		        if (!selectedRoom.equals("--- 채팅방 목록 ---")) {
+		            int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
+		            if (choice == JOptionPane.YES_OPTION) {
+		                cardLayout.show(mainPanel, "chatPanel");
+		                welcomeSendMessage();
+		            } else {
+		                // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
+		            }
+		        }
+		    }
+		});
 		
 
         chPlusButton.setBounds(26, 92, 50, 50);
@@ -322,6 +329,7 @@ public class KakaoClient extends JFrame {
         chatPanel.add(contentScroll);
         
         contentView = new JTextArea();
+        contentView.setEditable(false);
         contentScroll.setViewportView(contentView);
         
         JScrollPane messageScroll = new JScrollPane();
@@ -336,7 +344,7 @@ public class KakaoClient extends JFrame {
 				
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			
-						sendMessage();
+					sendMessage();
 				}
 				
 			}
@@ -391,17 +399,28 @@ public class KakaoClient extends JFrame {
 	
 	
 	private void sendMessage() {
+	
 		if(!messageInput.getText().isBlank()) { 
 			
-				String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
-				
-				MessageReqDto messageReqDto =
-						new MessageReqDto(toUser, username, messageInput.getText());
-				
-				sendRequest("sendMessage", gson.toJson(messageReqDto));
-				System.out.println(messageReqDto);
-				messageInput.setText("");
+			String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
+			MessageReqDto messageReqDto = new MessageReqDto(toUser, username, messageInput.getText());
+			sendRequest("sendMessage", gson.toJson(messageReqDto));
+			messageInput.setText("");
 				
 		  }
+	}
+	
+
+	private void welcomeSendMessage() {
+	    
+	        //String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
+	        String username = KakaoClient.getInstance().getUsername(); // Assuming that the username is stored in the KakaoClient class
+
+	        String welcomeMessage = username + "님 입장을 환영합니다.";
+	        
+	        MessageReqDto messageReqDto = new MessageReqDto("welcome", username, welcomeMessage);
+	        sendRequest("sendMessage", gson.toJson(messageReqDto));
+	        //contentView.append(welcomeMessage + "\n");
+	      
 	}
 }
