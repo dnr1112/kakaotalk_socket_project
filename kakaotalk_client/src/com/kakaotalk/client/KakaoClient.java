@@ -1,5 +1,6 @@
 package com.kakaotalk.client;
 
+import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.EventQueue;
 import java.awt.Font;
@@ -23,6 +24,7 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -35,7 +37,6 @@ import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
 import com.kakaotalk.clientDto.JoinReqDto;
 import com.kakaotalk.clientDto.MessageReqDto;
-import com.kakaotalk.clientDto.MessageRespDto;
 import com.kakaotalk.clientDto.RequestDto;
 
 import lombok.Getter;
@@ -174,6 +175,8 @@ public class KakaoClient extends JFrame {
         // 채팅 화면
         JPanel chatPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
+            
+            
             
             @Override
             protected void paintComponent(Graphics g) {
@@ -324,8 +327,16 @@ public class KakaoClient extends JFrame {
         mainPanel.add(chatPanel, "chatPanel");
         chatPanel.setLayout(null);
         
+        JScrollPane textScroll = new JScrollPane();
+        textScroll.setBounds(69,56,292,-45);
+        chatPanel.add(textScroll);
+        
+        JLabel textLabel = new JLabel("제목 입력되니?");
+        textLabel.setBounds(93, 10, 249, 50);
+        chatPanel.add(textLabel);
+        
         JScrollPane contentScroll = new JScrollPane();
-        contentScroll.setBounds(0, 76, 464, 577);
+        contentScroll.setBounds(0, 70, 464, 621);
         chatPanel.add(contentScroll);
         
         contentView = new JTextArea();
@@ -333,7 +344,7 @@ public class KakaoClient extends JFrame {
         contentScroll.setViewportView(contentView);
         
         JScrollPane messageScroll = new JScrollPane();
-        messageScroll.setBounds(10, 675, 375, 76);
+        messageScroll.setBounds(10, 701, 375, 50);
         chatPanel.add(messageScroll);
         
         messageInput = new JTextField();
@@ -360,7 +371,7 @@ public class KakaoClient extends JFrame {
         	}
         });
         sendButton.setIcon(enterButtonImg);
-        sendButton.setBounds(397, 689, 50, 50);
+        sendButton.setBounds(397, 701, 50, 50);
         sendButton.setBorderPainted(true);
         sendButton.setContentAreaFilled(false);
         sendButton.setFocusPainted(false);
@@ -374,7 +385,7 @@ public class KakaoClient extends JFrame {
         	}
         });
         exitButton.setIcon(exitButtonImg);
-        exitButton.setBounds(386, 10, 50, 50);
+        exitButton.setBounds(397, 10, 50, 50);
         exitButton.setBorderPainted(true);
         exitButton.setContentAreaFilled(false);
         exitButton.setFocusPainted(false);
