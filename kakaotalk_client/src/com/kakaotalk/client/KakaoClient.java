@@ -34,8 +34,8 @@ import javax.swing.SwingConstants;
 import com.google.gson.Gson;
 import com.kakaotalk.clientDto.CreateReqDto;
 import com.kakaotalk.clientDto.JoinReqDto;
-import com.kakaotalk.clientDto.JoinRespDto;
 import com.kakaotalk.clientDto.MessageReqDto;
+import com.kakaotalk.clientDto.MessageRespDto;
 import com.kakaotalk.clientDto.RequestDto;
 
 import lombok.Getter;
@@ -344,7 +344,7 @@ public class KakaoClient extends JFrame {
 				
 				if(e.getKeyCode() == KeyEvent.VK_ENTER) {
 			
-						sendMessage();
+					sendMessage();
 				}
 				
 			}
@@ -399,35 +399,28 @@ public class KakaoClient extends JFrame {
 	
 	
 	private void sendMessage() {
+	
 		if(!messageInput.getText().isBlank()) { 
 			
-				String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
-				
-				MessageReqDto messageReqDto =
-						new MessageReqDto(toUser, username, messageInput.getText());
-				
-				sendRequest("sendMessage", gson.toJson(messageReqDto));
-				System.out.println(messageReqDto);
-				messageInput.setText("");
+			String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
+			MessageReqDto messageReqDto = new MessageReqDto(toUser, username, messageInput.getText());
+			sendRequest("sendMessage", gson.toJson(messageReqDto));
+			messageInput.setText("");
 				
 		  }
 	}
 	
 
 	private void welcomeSendMessage() {
-	    if(!messageInput.getText().isBlank()) { 
-	        String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
+	    
+	        //String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
 	        String username = KakaoClient.getInstance().getUsername(); // Assuming that the username is stored in the KakaoClient class
 
-	        // Display a welcome message in the contentView
-	        String welcomeMessage = username + " 님 입장을 환영합니다.";
+	        String welcomeMessage = username + "님 입장을 환영합니다.";
 	        
-	        System.out.println(welcomeMessage);
-	        contentView.append(welcomeMessage + "\n");
-
-	        // Send the welcome message to the selected user or all users
-	        // (assuming you have a sendMessage method that sends a message to the specified user(s))
-	        
-	    }
+	        MessageReqDto messageReqDto = new MessageReqDto("welcome", username, welcomeMessage);
+	        sendRequest("sendMessage", gson.toJson(messageReqDto));
+	        //contentView.append(welcomeMessage + "\n");
+	      
 	}
 }

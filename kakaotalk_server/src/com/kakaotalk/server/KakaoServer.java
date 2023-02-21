@@ -66,7 +66,6 @@ class ConnectedSocket extends Thread{
 						for(ConnectedSocket connectedSocket : socketListUsers) {
 						connectedUsers.add(connectedSocket.getUsername());
 						}
-						//여기.....
 						//System.out.println("connectedUsers: " + connectedUsers);
 						//System.out.println("UserCounts: " + connectedUsers.size());
 						JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
@@ -87,15 +86,22 @@ class ConnectedSocket extends Thread{
 						
 						MessageReqDto messageReqDto = gson.fromJson(requestDto.getBody(), MessageReqDto.class);
 						
-						if(messageReqDto.getToUser().equalsIgnoreCase("all")) {
+						if(messageReqDto.getToUser().equalsIgnoreCase("welcome")) {
+							//System.out.println(messageReqDto);
+							String message = "[Server]: " + messageReqDto.getMessageValue();
+							MessageRespDto messageRespDto2 = new MessageRespDto(message);
+							sendToAll(requestDto.getResource(), "ok", gson.toJson(messageRespDto2));
+						}else if(messageReqDto.getToUser().equalsIgnoreCase("all")) {
 							String message = messageReqDto.getFromUser() + "[전체]: " + messageReqDto.getMessageValue();
-							MessageRespDto messageRespDto = new MessageRespDto(message);
-							sendToAll(requestDto.getResource(), "ok", gson.toJson(messageRespDto));
+							MessageRespDto messageRespDto2 = new MessageRespDto(message);
+							sendToAll(requestDto.getResource(), "ok", gson.toJson(messageRespDto2));
 						}else {
 							String message = messageReqDto.getFromUser() + "[" + messageReqDto.getToUser() + "]: " + messageReqDto.getMessageValue();
-							MessageRespDto messageRespDto = new MessageRespDto(message);
-							sendToUser(requestDto.getResource(), "ok", gson.toJson(messageRespDto),messageReqDto.getToUser());	
+							MessageRespDto messageRespDto2 = new MessageRespDto(message);
+							sendToUser(requestDto.getResource(), "ok", gson.toJson(messageRespDto2),messageReqDto.getToUser());	
+							
 						}
+						
 						break;
 				}
 			}
