@@ -9,6 +9,6 @@ import lombok.Data;
 @Data
 public class JoinRespDto {
 	
-	private String welcomeMessage;
+	//private String welcomeMessage;
 	private List<String> connectedUsers;
 }

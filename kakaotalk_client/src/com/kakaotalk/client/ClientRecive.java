@@ -48,8 +48,7 @@ public class ClientRecive extends Thread {
 								//KakaoClient.getInstance().getUserListModel().size();
 								KakaoClient.getInstance().getUserListModel().addElement("접속 유저 현황"+"("+joinRespDto.getConnectedUsers().size()+"명)");
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
-								//KakaoClient.getInstance().getUserList().setSelectedIndex(0);
-								//append(joinRespDto.getWelcomeMessage()+"\n");
+								System.out.println(joinRespDto);
 								
 								break;
 					
@@ -58,7 +57,7 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getChattingListModel().clear();
 								KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅방 목록 ---");
 								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getConnectedRooms());
-				
+								System.out.println(createRespDto);
 								//KakaoClient.getInstance().getChattingList().setSelectedIndex(0);
 								break;
 						case "sendMessage" :

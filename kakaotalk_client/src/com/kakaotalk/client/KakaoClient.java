@@ -2,6 +2,7 @@ package com.kakaotalk.client;
 
 import java.awt.BorderLayout;
 import java.awt.CardLayout;
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -76,6 +77,7 @@ public class KakaoClient extends JFrame {
     private JPanel createPanel;
     private JPanel chatPanel;
     private CardLayout cardLayout;
+    private JLabel  titleLabel;
     
     private JTextField userNameField;
     private JTextField messageInput;
@@ -213,11 +215,24 @@ public class KakaoClient extends JFrame {
             	String ip = "127.0.0.1";
             	int port = 9090;
             	
+            	 username = userNameField.getText().trim(); // trim()을 사용하여 입력값 앞뒤 공백 제거
+            	    
+            	 if(username == null || username.equals("")) {
+            		    JOptionPane.showMessageDialog(null, "사용자 이름을 입력해주세요.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            		    return;
+            		}
+
+            		// 입력값이 공백으로만 이루어진 경우 에러메시지 출력 후 리턴
+            		if(username.matches("\\s+")) {
+            		    JOptionPane.showMessageDialog(null, "사용자 이름은 공백으로만 입력할 수 없습니다.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            		    return;
+            		}
+            	
             	try {
 					socket = new Socket(ip,port);
 					ClientRecive clientRecive = new ClientRecive(socket);
 					clientRecive.start();
-					username = userNameField.getText();
+					//username = userNameField.getText();
 	          
 					JOptionPane.showMessageDialog(null, 
 							username + "님 접속을 환영합니다." , 
@@ -244,9 +259,6 @@ public class KakaoClient extends JFrame {
 					
 					e1.printStackTrace();
 				}
-            	
-            	
-          
             }
         });
         
@@ -255,33 +267,36 @@ public class KakaoClient extends JFrame {
         createPanel.add(chattingListScroll);
         
         JButton chPlusButton = new JButton();
-        chPlusButton.addActionListener(new ActionListener() {
-        	public void actionPerformed(ActionEvent e) {
-       
-	try {
-		   createroom =JOptionPane.showInputDialog(null,
-				   "방의 제목을 입력하시오.","방 생성",
-				   JOptionPane.INFORMATION_MESSAGE);
-	       CreateReqDto createReqDto = new CreateReqDto(createroom);
-		   String createReqDtoJson = gson.toJson(createReqDto);
-		   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
-		   String requestDtoJson = gson.toJson(requestDto);	
-		   OutputStream outputStream = socket.getOutputStream();
-		   PrintWriter out = new PrintWriter(outputStream,true);
-		   out.println(requestDtoJson);
-	} catch (ConnectException e1) {
-		
-		JOptionPane.showMessageDialog(null, 
-				"방 생성 실패" , 
-				"생성 실패",
-				JOptionPane.ERROR_MESSAGE);
-	}catch (UnknownHostException e1) {
-		e1.printStackTrace();
-	}catch (IOException e1) {
-		e1.printStackTrace();
-	}
-  }
-});
+        chPlusButton.addMouseListener(new MouseAdapter() {
+        	@Override
+        	public void mouseClicked(MouseEvent e) {
+        		try {
+        			   createroom =JOptionPane.showInputDialog(null,
+        					   "방의 제목을 입력하시오.","방 생성",
+        					   JOptionPane.INFORMATION_MESSAGE);
+        			   chattingListModel.addElement("[" + createroom + "] 방이 개설되었습니다.");
+        			   titleLabel.setText("방 제목: " + createroom);
+        		       CreateReqDto createReqDto = new CreateReqDto(createroom);
+        			   String createReqDtoJson = gson.toJson(createReqDto);
+        			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
+        			   String requestDtoJson = gson.toJson(requestDto);	
+        			   OutputStream outputStream = socket.getOutputStream();
+        			   PrintWriter out = new PrintWriter(outputStream,true);
+        			   out.println(requestDtoJson);
+        		} catch (ConnectException e1) {
+        			
+        			JOptionPane.showMessageDialog(null, 
+        					"방 생성 실패" , 
+        					"생성 실패",
+        					JOptionPane.ERROR_MESSAGE);
+        		}catch (UnknownHostException e1) {
+        			e1.printStackTrace();
+        		}catch (IOException e1) {
+        			e1.printStackTrace();
+        		}
+        	}
+        });
+        
         
         
         chattingListModel = new DefaultListModel<>();
@@ -323,17 +338,20 @@ public class KakaoClient extends JFrame {
 		userList = new JList<String>(userListModel);
 		userListScroll.setViewportView(userList);
         
-        //JPanel chatPanel = new JPanel();
+     
         mainPanel.add(chatPanel, "chatPanel");
         chatPanel.setLayout(null);
         
         JScrollPane textScroll = new JScrollPane();
-        textScroll.setBounds(69,56,292,-45);
-        chatPanel.add(textScroll);
+        textScroll.setPreferredSize(new Dimension(292, 45));
+        textScroll.setBounds(69, 56, 292, 45);
         
-        JLabel textLabel = new JLabel("제목 입력되니?");
-        textLabel.setBounds(93, 10, 249, 50);
-        chatPanel.add(textLabel);
+        titleLabel = new JLabel();
+        titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        titleLabel.setFont(new Font("SansSerif", Font.BOLD | Font.ITALIC, 18));
+        titleLabel.setBounds(93, 10, 249, 50);
+        chatPanel.add(titleLabel);
+        
         
         JScrollPane contentScroll = new JScrollPane();
         contentScroll.setBounds(0, 70, 464, 621);

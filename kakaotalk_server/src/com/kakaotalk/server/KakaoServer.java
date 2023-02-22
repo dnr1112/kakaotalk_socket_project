@@ -68,7 +68,8 @@ class ConnectedSocket extends Thread{
 						}
 						//System.out.println("connectedUsers: " + connectedUsers);
 						//System.out.println("UserCounts: " + connectedUsers.size());
-						JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
+						//JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
+						JoinRespDto joinRespDto = new JoinRespDto(connectedUsers);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
 						CreateRespDto createRespDto1 = new CreateRespDto(connectedChatting);
 		                sendToAll("create", "ok",gson.toJson(createRespDto1));
