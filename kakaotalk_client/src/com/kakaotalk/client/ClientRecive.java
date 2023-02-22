@@ -1,5 +1,4 @@
 package com.kakaotalk.client;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,19 +14,14 @@ import com.kakaotalk.clientDto.ResponseDto;
 import lombok.RequiredArgsConstructor;
 
 
-
-
-
 @RequiredArgsConstructor
 
 public class ClientRecive extends Thread {
-		
 	private final Socket socket;
 	private InputStream inputStream;
 	private Gson gson;
 	private static CreateRespDto createRespDto;
 
-	
 		 @Override
 		public void run() {
 			
@@ -49,7 +43,6 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getUserListModel().addElement("접속 유저 현황"+"("+joinRespDto.getConnectedUsers().size()+"명)");
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
 								System.out.println(joinRespDto);
-								
 								break;
 					
 						case "create" :
@@ -63,16 +56,12 @@ public class ClientRecive extends Thread {
 						case "sendMessage" :
 								MessageRespDto messageRespDto = gson.fromJson(responseDto.getBody(),MessageRespDto.class);
 								KakaoClient.getInstance().getContentView().append(messageRespDto.getMessageValue()+ "\n");
-					
+								System.out.println(messageRespDto);
 					}
-					
-					
 				}
 			} catch (IOException e) {
 				
 				e.printStackTrace();
 			}
-			 
-			 
 		}
 }
