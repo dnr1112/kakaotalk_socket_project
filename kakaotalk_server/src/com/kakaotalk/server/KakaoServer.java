@@ -46,6 +46,8 @@ class ConnectedSocket extends Thread{
 		//socketListCreate.add(this);
 	}
 	
+	Room room;
+	
 	@Override
 	public void run() {
 		try {
@@ -74,15 +76,21 @@ class ConnectedSocket extends Thread{
 						CreateRespDto createRespDto1 = new CreateRespDto(connectedChatting);
 		                sendToAll("create", "ok",gson.toJson(createRespDto1));
 						break;
+						
 					case "create" : 
 						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
 						chattingname = createReqDto.getCreateRoom();
+						
 						connectedChatting.add(chattingname);
 						//System.out.println("chattingname: " + connectedChatting);
 						//System.out.println("RoomCounts: " + connectedChatting.size());
 						CreateRespDto createRespDto2 = new CreateRespDto(connectedChatting);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto2));
+						
+						this.room = new Room(chattingname, username, socketListUsers);
+						
 						break;
+								
 					case "sendMessage":
 						
 						MessageReqDto messageReqDto = gson.fromJson(requestDto.getBody(), MessageReqDto.class);
@@ -102,7 +110,6 @@ class ConnectedSocket extends Thread{
 							sendToUser(requestDto.getResource(), "ok", gson.toJson(messageRespDto2),messageReqDto.getToUser());	
 							
 						}
-						
 						break;
 				}
 			}
@@ -112,6 +119,7 @@ class ConnectedSocket extends Thread{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+		System.out.println(room == null);
 	}
 	
 	
