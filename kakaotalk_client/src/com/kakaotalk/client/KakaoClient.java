@@ -281,6 +281,7 @@ public class KakaoClient extends JFrame {
         				}
         			   chattingListModel.addElement("[" + createroom + "] 방이 개설되었습니다.");
         			   titleLabel.setText("방 제목: " + createroom);
+
         		       CreateReqDto createReqDto = new CreateReqDto(createroom);
         			   String createReqDtoJson = gson.toJson(createReqDto);
         			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
@@ -348,6 +349,7 @@ public class KakaoClient extends JFrame {
         JScrollPane textScroll = new JScrollPane();
         textScroll.setPreferredSize(new Dimension(292, 45));
         textScroll.setBounds(69, 56, 292, 45);
+
         
         titleLabel = new JLabel();
         titleLabel.setHorizontalAlignment(SwingConstants.LEFT);
@@ -355,6 +357,7 @@ public class KakaoClient extends JFrame {
         titleLabel.setBounds(93, 10, 249, 50);
         chatPanel.add(titleLabel);
         
+
         
         JScrollPane contentScroll = new JScrollPane();
         contentScroll.setBounds(0, 70, 464, 621);
