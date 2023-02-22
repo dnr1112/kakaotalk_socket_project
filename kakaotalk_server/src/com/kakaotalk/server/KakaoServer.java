@@ -9,7 +9,6 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -40,7 +39,7 @@ class ConnectedSocket extends Thread{
 	private String chattingname;
 	private String roomName;
 	private String roomOwner;
-	private Room room;
+	//private Room room;
 	
 	public ConnectedSocket(Socket socket) {
 		this.socket = socket;
@@ -74,7 +73,6 @@ class ConnectedSocket extends Thread{
 						}
 						//System.out.println("connectedUsers: " + connectedUsers);
 						//System.out.println("UserCounts: " + connectedUsers.size());
-						//JoinRespDto joinRespDto = new JoinRespDto(username + "님이 접속하였습니다.",connectedUsers);
 						JoinRespDto joinRespDto = new JoinRespDto(connectedUsers);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
 						CreateRespDto createRespDto1 = new CreateRespDto(connectedChatting);
