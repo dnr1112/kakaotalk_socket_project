@@ -9,6 +9,7 @@ import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.google.gson.Gson;
@@ -26,7 +27,6 @@ import lombok.Data;
 @Data
 class ConnectedSocket extends Thread{
 	private static List<ConnectedSocket> socketListUsers = new ArrayList<>();
-	//private static List<ConnectedSocket> socketListCreate = new ArrayList<>();
 	private static List<String> connectedChatting = new ArrayList<>();
 	private Socket socket;
 
@@ -38,6 +38,8 @@ class ConnectedSocket extends Thread{
 	
 	private String username;
 	private String chattingname;
+	private String roomName;
+	private String roomOwner;
 	private Room room;
 	
 	public ConnectedSocket(Socket socket) {
@@ -84,14 +86,13 @@ class ConnectedSocket extends Thread{
 						chattingname = createReqDto.getCreateRoom();
 						
 						connectedChatting.add(chattingname);
-						//System.out.println("chattingname: " + connectedChatting);
-						//System.out.println("RoomCounts: " + connectedChatting.size());
+						//room = new Room(roomName, roomOwner, userList);
+						//System.out.println(room);
 						CreateRespDto createRespDto2 = new CreateRespDto(connectedChatting);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto2));
-						
-						this.room = new Room(chattingname, username, socketListUsers);
-						
 						break;
+					
+						
 								
 					case "sendMessage":
 						
