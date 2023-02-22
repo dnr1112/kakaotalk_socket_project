@@ -38,6 +38,7 @@ class ConnectedSocket extends Thread{
 	
 	private String username;
 	private String chattingname;
+	private Room room;
 	
 	public ConnectedSocket(Socket socket) {
 		this.socket = socket;
@@ -46,7 +47,8 @@ class ConnectedSocket extends Thread{
 		//socketListCreate.add(this);
 	}
 	
-	Room room;
+	
+	
 	
 	@Override
 	public void run() {
@@ -100,15 +102,14 @@ class ConnectedSocket extends Thread{
 							String message = "[Server]: " + messageReqDto.getMessageValue();
 							MessageRespDto messageRespDto2 = new MessageRespDto(message);
 							sendToAll(requestDto.getResource(), "ok", gson.toJson(messageRespDto2));
-						}else if(messageReqDto.getToUser().equalsIgnoreCase("all")) {
-							String message = messageReqDto.getFromUser() + "[전체]: " + messageReqDto.getMessageValue();
+						}else if(messageReqDto.getToUser().equalsIgnoreCase("exit")) {
+							String message = "[Server]: " + messageReqDto.getMessageValue();
 							MessageRespDto messageRespDto2 = new MessageRespDto(message);
 							sendToAll(requestDto.getResource(), "ok", gson.toJson(messageRespDto2));
 						}else {
-							String message = messageReqDto.getFromUser() + "[" + messageReqDto.getToUser() + "]: " + messageReqDto.getMessageValue();
+							String message = messageReqDto.getFromUser() + "> " + messageReqDto.getMessageValue();
 							MessageRespDto messageRespDto2 = new MessageRespDto(message);
-							sendToUser(requestDto.getResource(), "ok", gson.toJson(messageRespDto2),messageReqDto.getToUser());	
-							
+							sendToAll(requestDto.getResource(), "ok", gson.toJson(messageRespDto2));
 						}
 						break;
 				}
@@ -119,7 +120,8 @@ class ConnectedSocket extends Thread{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
-		System.out.println(room == null);
+		
+		//System.out.println(room == null);
 	}
 	
 	
@@ -134,19 +136,19 @@ class ConnectedSocket extends Thread{
 		}
 	}
 	
-	private void sendToUser(String resouce, String status, String body, String toUser) throws IOException {
-		
-		ResponseDto responseDto = new ResponseDto(resouce, status, body);
-		for(ConnectedSocket connectedSocket : socketListUsers) {
-			if(connectedSocket.getUsername().equals(toUser)||connectedSocket.getUsername().equals(username)) {
-				OutputStream outputStream = connectedSocket.getSocket().getOutputStream();
-				PrintWriter out = new PrintWriter(outputStream,true);
-				
-				out.println(gson.toJson(responseDto));
-				
-			}
-		}
-	}
+//	private void sendToUser(String resouce, String status, String body, String toUser) throws IOException {
+//		
+//		ResponseDto responseDto = new ResponseDto(resouce, status, body);
+//		for(ConnectedSocket connectedSocket : socketListUsers) {
+//			if(connectedSocket.getUsername().equals(toUser)||connectedSocket.getUsername().equals(username)) {
+//				OutputStream outputStream = connectedSocket.getSocket().getOutputStream();
+//				PrintWriter out = new PrintWriter(outputStream,true);
+//				
+//				out.println(gson.toJson(responseDto));
+//				
+//			}
+//		}
+//	}
 	
 }
 

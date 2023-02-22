@@ -274,7 +274,11 @@ public class KakaoClient extends JFrame {
         			   createroom =JOptionPane.showInputDialog(null,
         					   "방의 제목을 입력하시오.","방 생성",
         					   JOptionPane.INFORMATION_MESSAGE);
-
+        			   if (createroom == null || createroom.trim().isEmpty()) {
+        				    throw new IllegalArgumentException("방 제목을 입력하세요.");
+        				} else if (createroom.matches("^\\s+$")) {
+        				    throw new IllegalArgumentException("방 제목은 공백으로만 이루어질 수 없습니다.");
+        				}
         			   chattingListModel.addElement("[" + createroom + "] 방이 개설되었습니다.");
         			   titleLabel.setText("방 제목: " + createroom);
 
@@ -285,18 +289,16 @@ public class KakaoClient extends JFrame {
         			   OutputStream outputStream = socket.getOutputStream();
         			   PrintWriter out = new PrintWriter(outputStream,true);
         			   out.println(requestDtoJson);
-        		} catch (ConnectException e1) {
-        			
-        			JOptionPane.showMessageDialog(null, 
-        					"방 생성 실패" , 
-        					"생성 실패",
-        					JOptionPane.ERROR_MESSAGE);
-        		}catch (UnknownHostException e1) {
-        			e1.printStackTrace();
-        		}catch (IOException e1) {
-        			e1.printStackTrace();
-        		}
-        	}
+        		} catch (IllegalArgumentException e1) {
+                    JOptionPane.showMessageDialog(null,
+                            e1.getMessage(), "입력 오류",
+                            JOptionPane.ERROR_MESSAGE);
+                } catch (UnknownHostException e1) {
+                    e1.printStackTrace();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
         });
         
         
@@ -403,6 +405,8 @@ public class KakaoClient extends JFrame {
         exitButton.addMouseListener(new MouseAdapter() {
         	@Override
         	public void mouseClicked(MouseEvent e) {
+        		exitSendMessage();
+        		//clearChat();
         		cardLayout.show(mainPanel, "createPanel");
         	}
         });
@@ -416,6 +420,10 @@ public class KakaoClient extends JFrame {
         
         
     }
+    
+//    public void clearChat() {
+//    	contentView.setText("");
+//    }
     
     private void sendRequest(String resouce, String body) {
 		OutputStream outputStream;
@@ -435,9 +443,10 @@ public class KakaoClient extends JFrame {
 	
 		if(!messageInput.getText().isBlank()) { 
 			
-			String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
+			String toUser = KakaoClient.getInstance().getUsername();
 			MessageReqDto messageReqDto = new MessageReqDto(toUser, username, messageInput.getText());
 			sendRequest("sendMessage", gson.toJson(messageReqDto));
+			System.out.println(messageReqDto);
 			messageInput.setText("");
 				
 		  }
@@ -455,5 +464,21 @@ public class KakaoClient extends JFrame {
 	        sendRequest("sendMessage", gson.toJson(messageReqDto));
 	        //contentView.append(welcomeMessage + "\n");
 	      
+	}
+	
+	
+	
+	
+	private void exitSendMessage() {
+	    
+		
+        String username = KakaoClient.getInstance().getUsername(); // Assuming that the username is stored in the KakaoClient class
+
+        String exitMessage = username + "님이 퇴장하셨습니다.";
+        MessageReqDto messageReqDto = new MessageReqDto("exit", username, exitMessage);
+        sendRequest("sendMessage", gson.toJson(messageReqDto));
+        contentView.setText("");
+        
+      
 	}
 }
