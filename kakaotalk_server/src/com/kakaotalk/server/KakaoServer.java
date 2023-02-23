@@ -31,7 +31,7 @@ class ConnectedSocket extends Thread{
 	private static List<String> selectedChatting = new ArrayList<>();
 	private static List<Room> roomList = new ArrayList<>();
 	private static List<String> roomNames = new ArrayList<>();
-
+	private static List<String> userList ;
 	private Socket socket;
 	
 	
@@ -44,9 +44,8 @@ class ConnectedSocket extends Thread{
 	private String roomName;
 	private String chattingRoomName;
 	private String roomOwner;
-	private List<String> userList ;
 	
-
+	private JoinRespDto joinRespDto = new JoinRespDto();
 	
 	public ConnectedSocket(Socket socket) {
 		this.socket = socket;
@@ -68,35 +67,56 @@ class ConnectedSocket extends Thread{
 				String request = in.readLine();  // requestDto(JSON) 
 				RequestDto requestDto = gson.fromJson(request, RequestDto.class);
 				
-				
-				switch(requestDto.getResource()) {
+				if (requestDto != null && requestDto.getResource() != null) {
+					switch(requestDto.getResource()) {
 					case "join" : 
 						JoinReqDto joinReqDto = gson.fromJson(requestDto.getBody(), JoinReqDto.class);
 						username = joinReqDto.getUsername();
+						
 						List<String> connectedUsers = new ArrayList<>();
 						for(ConnectedSocket connectedSocket : socketList) {
 						connectedUsers.add(connectedSocket.getUsername());
 						}
-						JoinRespDto joinRespDto = new JoinRespDto(connectedUsers);
+//						System.out.println("joinReqDto: "+joinReqDto);
+//						System.out.println("username: "+username);
+//						System.out.println("connectedUsers: "+connectedUsers);
+//						System.out.println("socketList: "+socketList);
+//						System.out.println("this: "+ this);
+						
+						
+						joinRespDto = new JoinRespDto(connectedUsers);
+						//System.out.println(joinRespDto);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
-						CreateRespDto createRespDto1 = new CreateRespDto(selectedChatting);
+						CreateRespDto createRespDto1 = new CreateRespDto(roomNames);
 		                sendToAll("create", "ok",gson.toJson(createRespDto1));
 						break;
+
 						
 					case "create":
-						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
-						roomName = createReqDto.getRoomName();
-						roomOwner = createReqDto.getUserName();
-						Room room = new Room(roomName, roomOwner, this);
-						roomList = new ArrayList<>();
-						roomList.add(room);
-						System.out.println(roomName);
-						System.out.println(roomOwner);
-					    System.out.println(roomList);
+					    CreateReqDto createReqDto2 = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
+					    System.out.println("joinRespDto: "+joinRespDto);
+					    System.out.println("createReqDto2: "+createReqDto2);
+					    roomName = createReqDto2.getRoomName();
+					    roomOwner = createReqDto2.getUserName();
+					    List<String> userList = new ArrayList<>();
+					    if (joinRespDto != null) {
+					        userList = joinRespDto.getConnectedUsers(); // joinRespDto에서 유저 이름 목록을 가져옵니다
+					    }
+					    System.out.println(userList);
+					    userList.add(roomOwner); // 방을 생성한 유저도 유저 목록에 추가합니다
+					    Room room = new Room(roomName, roomOwner, this);
+					    roomList = new ArrayList<>();
+					    roomList.add(room);
+					    //System.out.println("createReqDto: "+createReqDto2);
+					    //System.out.println("roomName: "+roomName);
+					    //System.out.println("roomOwner: "+roomOwner);
+					    //System.out.println("roomList: "+roomList);
 					    roomNames.add(roomName);
+					    //System.out.println("roomNames: "+roomNames);
+					    //System.out.println("this: "+this);
 					    CreateRespDto createRespDto = new CreateRespDto(roomNames);
 					    sendToAll("create", "ok", gson.toJson(createRespDto));
-					    break;	
+					    break;
 					    
 					    
 					case "selectChatRoom":
@@ -113,7 +133,7 @@ class ConnectedSocket extends Thread{
 					        selectRespDto.setSelectedUserList(selectedChatting);
 					        sendToAll("selectChatRoom", "ok", gson.toJson(selectRespDto));
 					    } else {
-					        sendToAll("selectChatRoom", "error", "Failed to find the room.");
+					       
 					    }
 					    break;
 						
@@ -139,6 +159,10 @@ class ConnectedSocket extends Thread{
 						}
 						break;
 				}
+				} else {
+				    // requestDto 또는 requestDto.getResource()가 null일 경우 예외 처리
+				}
+				
 			}
 		
 			

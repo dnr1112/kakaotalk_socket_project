@@ -9,7 +9,6 @@ import lombok.Data;
 @Data
 public class CreateRespDto {
 	
-	
 	private List<String> createdRooms;  // 생성된 방의 이름을 List에 담는다.
 }
 

@@ -44,7 +44,7 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getUserListModel().clear();
 								KakaoClient.getInstance().getUserListModel().addElement("접속 유저 현황"+"("+joinRespDto.getConnectedUsers().size()+"명)");
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
-								System.out.println(joinRespDto);
+								//System.out.println(joinRespDto);
 								break;
 					
 						case "create" :
@@ -52,7 +52,7 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getChattingListModel().clear();
 								KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅방 목록 ---");
 								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getCreatedRooms());
-								System.out.println(createRespDto);
+								//System.out.println(createRespDto);
 								//KakaoClient.getInstance().getChattingList().setSelectedIndex(0);
 								break;
 								
@@ -64,7 +64,7 @@ public class ClientRecive extends Thread {
 						case "sendMessage" :
 								MessageRespDto messageRespDto = gson.fromJson(responseDto.getBody(),MessageRespDto.class);
 								KakaoClient.getInstance().getContentView().append(messageRespDto.getMessageValue()+ "\n");
-								System.out.println(messageRespDto);
+								//System.out.println(messageRespDto);
 					}
 				}
 			} catch (IOException e) {
