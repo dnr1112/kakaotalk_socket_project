@@ -27,8 +27,11 @@ import lombok.Data;
 class ConnectedSocket extends Thread{
 	private static List<ConnectedSocket> socketListUsers = new ArrayList<>();
 	private static List<String> connectedChatting = new ArrayList<>();
-	private Socket socket;
+	private static List<Room> roomList = new ArrayList<>();
+	private static List<String> roomNames = new ArrayList<>();
 
+	private Socket socket;
+	
 	
 	private InputStream inputStream;
 	private OutputStream outputStream;
@@ -39,7 +42,9 @@ class ConnectedSocket extends Thread{
 	private String chattingname;
 	private String roomName;
 	private String roomOwner;
-	//private Room room;
+
+	
+
 	
 	public ConnectedSocket(Socket socket) {
 		this.socket = socket;
@@ -74,22 +79,38 @@ class ConnectedSocket extends Thread{
 						//System.out.println("connectedUsers: " + connectedUsers);
 						//System.out.println("UserCounts: " + connectedUsers.size());
 						JoinRespDto joinRespDto = new JoinRespDto(connectedUsers);
+						
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
 						CreateRespDto createRespDto1 = new CreateRespDto(connectedChatting);
 		                sendToAll("create", "ok",gson.toJson(createRespDto1));
 						break;
 						
-					case "create" : 
-						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
-						chattingname = createReqDto.getCreateRoom();
+//					case "create" : 
+//						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
+//						chattingname = createReqDto.getCreateRoom();
+//						
+//						connectedChatting.add(chattingname);
+//						//room = new Room(roomName, roomOwner, userList);
+//						//System.out.println(room);
+//						CreateRespDto createRespDto2 = new CreateRespDto(connectedChatting);
+//						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto2));
+//						break;
 						
-						connectedChatting.add(chattingname);
-						//room = new Room(roomName, roomOwner, userList);
-						//System.out.println(room);
-						CreateRespDto createRespDto2 = new CreateRespDto(connectedChatting);
-						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto2));
-						break;
-					
+						
+						
+					case "create":
+					    CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
+					    roomName = createReqDto.getRoomName();
+					    roomOwner = createReqDto.getUserName();
+					    Room room = new Room(roomName, roomOwner);
+					    //room.setUserList(connectedUsers);
+					    this.createRoom(room);
+					    
+					    System.out.println(room);
+					    connectedChatting.add(roomName);
+					    CreateRespDto createRespDto = new CreateRespDto(connectedChatting);
+					    sendToAll("create", "ok", gson.toJson(createRespDto));
+					    break;	
 						
 								
 					case "sendMessage":
@@ -134,6 +155,28 @@ class ConnectedSocket extends Thread{
 				
 		}
 	}
+	
+	private synchronized void createRoom(Room room) {
+        roomList.add(room);   // 방 목록에 추가
+        System.out.println(room.getRoomName() + "방 생성");
+    }
+    
+	private synchronized List<String> getRoomList() {
+       
+        for (Room room : roomList) {
+        	roomNames.add(room.getRoomName());
+        }
+        return roomNames;
+    }
+    
+	private synchronized Room getRoomByName(String roomName) {
+        for (Room room : roomList) {
+            if (room.getRoomName().equals(roomName)) {
+                return room;
+            }
+        }
+        return null;
+    }
 	
 //	private void sendToUser(String resouce, String status, String body, String toUser) throws IOException {
 //		

@@ -276,10 +276,11 @@ public class KakaoClient extends JFrame {
         				} else if (createroom.matches("^\\s+$")) {
         				    throw new IllegalArgumentException("방 제목은 공백으로만 이루어질 수 없습니다.");
         				}
-        
+
+
         			   titleLabel.setText("방 제목: " + createroom);
 
-        		       CreateReqDto createReqDto = new CreateReqDto(createroom);
+        		       CreateReqDto createReqDto = new CreateReqDto(createroom,username);
         			   String createReqDtoJson = gson.toJson(createReqDto);
         			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
         			   String requestDtoJson = gson.toJson(requestDto);	

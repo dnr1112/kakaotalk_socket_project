@@ -7,24 +7,16 @@ import lombok.Data;
 
 @Data
 public class Room {
-    private String roomName;
-    private String roomOwner;
-    private List<ConnectedSocket> userList ;
+    private String roomName; // 방이름
+    private String roomOwner; // 방장 이름
+    private List<String> userList; // 참가자 목록
     
     
 
-    public Room(String roomName, String roomOwner, List<ConnectedSocket> userList) {
-		this.roomName = roomName;
-		this.roomOwner = roomOwner;
-		this.userList = new ArrayList<>();
-	}
-
-    public void addUser(ConnectedSocket connectedSocket) {
-        userList.add(connectedSocket);
-    }
-    
-    public void removeUser(ConnectedSocket connectedSocket) {
-        userList.remove(connectedSocket);
+    public Room(String roomName, String roomOwner) {
+        this.roomName = roomName;
+        this.roomOwner = roomOwner;
+        this.userList = new ArrayList<>();
     }
 
 	
