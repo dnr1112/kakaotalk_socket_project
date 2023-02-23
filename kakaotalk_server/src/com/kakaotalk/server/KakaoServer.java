@@ -98,18 +98,27 @@ class ConnectedSocket extends Thread{
 						
 						
 					case "create":
-					    CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
-					    roomName = createReqDto.getRoomName();
-					    roomOwner = createReqDto.getUserName();
-					    Room room = new Room(roomName, roomOwner);
-					    //room.setUserList(connectedUsers);
-					    this.createRoom(room);
+						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
+						roomName = createReqDto.getRoomName();
+						roomOwner = createReqDto.getUserName();
+						Room room = new Room(roomName, roomOwner);
+						room.setUserList(createReqDto.getUserList()); // userList 설정
+						this.createRoom(room);
 					    
 					    System.out.println(room);
 					    connectedChatting.add(roomName);
 					    CreateRespDto createRespDto = new CreateRespDto(connectedChatting);
 					    sendToAll("create", "ok", gson.toJson(createRespDto));
 					    break;	
+					    
+					    
+					    
+					    
+					case "selectChatRoom" :
+						
+						
+						
+						
 						
 								
 					case "sendMessage":

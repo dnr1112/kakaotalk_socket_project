@@ -1,6 +1,5 @@
 package com.kakaotalk.client;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -19,6 +18,9 @@ import java.io.PrintWriter;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.DefaultListModel;
@@ -280,8 +282,9 @@ public class KakaoClient extends JFrame {
         				    throw new IllegalArgumentException("방 제목은 공백으로만 이루어질 수 없습니다.");
         				}
         			   titleLabel.setText("방 제목: " + createroom);
-
-        		       CreateReqDto createReqDto = new CreateReqDto(createroom,username);
+        			   List<String> userList = new ArrayList<>();
+        			   userList.add(username);
+        		       CreateReqDto createReqDto = new CreateReqDto(createroom,username,userList);
         			   String createReqDtoJson = gson.toJson(createReqDto);
         			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
         			   String requestDtoJson = gson.toJson(requestDto);	
