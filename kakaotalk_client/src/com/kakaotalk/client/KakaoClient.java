@@ -1,6 +1,5 @@
 package com.kakaotalk.client;
 
-import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
@@ -109,10 +108,11 @@ public class KakaoClient extends JFrame {
     	
     	gson = new Gson();
     	
+    	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setBounds(100, 100, 480, 800);
         setResizable(false);
         setTitle("KakaoTalk");
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setBounds(100, 100, 480, 800);
+        
         
         // 배경화면 이미지를 불러옵니다.
         final BufferedImage loginImg = ImageIO.read(KakaoClient.class.getResource("/com/kakaotalk/client/images/kakao.png"));
@@ -177,9 +177,6 @@ public class KakaoClient extends JFrame {
         // 채팅 화면
         JPanel chatPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
-            
-            
-            
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
@@ -209,8 +206,8 @@ public class KakaoClient extends JFrame {
         loginButton.setFocusPainted(false);
         loginButton.setRolloverIcon(loginButtonImg);
         loginPanel.add(loginButton);
-        loginButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
+        loginButton.addMouseListener(new MouseAdapter() {
+            public void mouseClicked(MouseEvent e) {
             	
             	String ip = "127.0.0.1";
             	int port = 9090;
@@ -230,19 +227,21 @@ public class KakaoClient extends JFrame {
             	
             	try {
 					socket = new Socket(ip,port);
-					ClientRecive clientRecive = new ClientRecive(socket);
-					clientRecive.start();
-					//username = userNameField.getText();
-	          
 					JOptionPane.showMessageDialog(null, 
 							username + "님 접속을 환영합니다." , 
 							"접속성공",
-							JOptionPane.INFORMATION_MESSAGE);  
+							JOptionPane.INFORMATION_MESSAGE); 
+					
+					ClientRecive clientRecive = new ClientRecive(socket);
+					clientRecive.start();
+	           
 	                cardLayout.show(mainPanel, "createPanel");
+	                
 	                JoinReqDto joinReqDto = new JoinReqDto(username);
 					String joinReqDtoJson = gson.toJson(joinReqDto);
 					RequestDto requestDto = new RequestDto("join", joinReqDtoJson);
 					String requestDtoJson = gson.toJson(requestDto);
+					
 					OutputStream outputStream = socket.getOutputStream();
 					PrintWriter out = new PrintWriter(outputStream,true);
 					out.println(requestDtoJson);
@@ -253,10 +252,8 @@ public class KakaoClient extends JFrame {
 							"접속실패",
 							JOptionPane.ERROR_MESSAGE);
             	}catch (UnknownHostException e1) {
-					
 					e1.printStackTrace();
 				} catch (IOException e1) {
-					
 					e1.printStackTrace();
 				}
             }
@@ -279,6 +276,8 @@ public class KakaoClient extends JFrame {
         				} else if (createroom.matches("^\\s+$")) {
         				    throw new IllegalArgumentException("방 제목은 공백으로만 이루어질 수 없습니다.");
         				}
+
+
         			   titleLabel.setText("방 제목: " + createroom);
 
         		       CreateReqDto createReqDto = new CreateReqDto(createroom,username);
@@ -309,20 +308,24 @@ public class KakaoClient extends JFrame {
 		
 		
 		chattingList.addMouseListener(new MouseAdapter() {
-			public void mouseClicked(MouseEvent e) {
+		    public void mouseClicked(MouseEvent e) {
 		        int selectedIdx = chattingList.getSelectedIndex();
-		        String selectedRoom = (String) chattingList.getModel().getElementAt(selectedIdx);
-		        if (!selectedRoom.equals("--- 채팅방 목록 ---")) {
-		            int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
-		            if (choice == JOptionPane.YES_OPTION) {
-		                cardLayout.show(mainPanel, "chatPanel");
-		                welcomeSendMessage();
-		            } else {
-		                // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
+		       System.out.println(selectedIdx);
+		        if (selectedIdx >= 0) {  // 수정된 부분
+		            String selectedRoom = (String) chattingList.getModel().getElementAt(selectedIdx);
+		            if (!selectedRoom.equals("--- 채팅방 목록 ---")) {
+		                int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
+		                if (choice == JOptionPane.YES_OPTION) {
+		                    cardLayout.show(mainPanel, "chatPanel");
+		                    welcomeSendMessage();
+		                } else {
+		                    // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
+		                }
 		            }
 		        }
 		    }
 		});
+
 		
 
         chPlusButton.setBounds(26, 92, 50, 50);
@@ -420,9 +423,6 @@ public class KakaoClient extends JFrame {
         
     }
     
-//    public void clearChat() {
-//    	contentView.setText("");
-//    }
     
     private void sendRequest(String resouce, String body) {
 		OutputStream outputStream;
@@ -453,31 +453,22 @@ public class KakaoClient extends JFrame {
 	
 
 	private void welcomeSendMessage() {
-	    
 	        //String toUser = userList.getSelectedIndex() == 0 ? "all" : userList.getSelectedValue();
 	        String username = KakaoClient.getInstance().getUsername(); // Assuming that the username is stored in the KakaoClient class
-
 	        String welcomeMessage = username + "님 입장을 환영합니다.";
-	        
 	        MessageReqDto messageReqDto = new MessageReqDto("welcome", username, welcomeMessage);
 	        sendRequest("sendMessage", gson.toJson(messageReqDto));
 	        //contentView.append(welcomeMessage + "\n");
-	      
 	}
 	
 	
 	
 	
 	private void exitSendMessage() {
-	    
-		
         String username = KakaoClient.getInstance().getUsername(); // Assuming that the username is stored in the KakaoClient class
-
         String exitMessage = username + "님이 퇴장하셨습니다.";
         MessageReqDto messageReqDto = new MessageReqDto("exit", username, exitMessage);
         sendRequest("sendMessage", gson.toJson(messageReqDto));
         contentView.setText("");
-        
-      
 	}
 }
