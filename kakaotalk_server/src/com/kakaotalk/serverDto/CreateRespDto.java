@@ -10,7 +10,7 @@ import lombok.Data;
 public class CreateRespDto {
 	
 	
-	private List<String> connectedRooms;  // 생성된 방의 이름을 List에 담는다.
+	private List<String> createdRooms;  // 생성된 방의 이름을 List에 담는다.
 }
 
 

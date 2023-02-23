@@ -5,8 +5,6 @@ import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Graphics;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -19,7 +17,6 @@ import java.net.ConnectException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 import javax.imageio.ImageIO;
@@ -41,6 +38,7 @@ import com.kakaotalk.clientDto.CreateReqDto;
 import com.kakaotalk.clientDto.JoinReqDto;
 import com.kakaotalk.clientDto.MessageReqDto;
 import com.kakaotalk.clientDto.RequestDto;
+import com.kakaotalk.clientDto.SelectReqDto;
 
 import lombok.Getter;
 
@@ -320,8 +318,22 @@ public class KakaoClient extends JFrame {
 		            if (!selectedRoom.equals("--- 채팅방 목록 ---")) {
 		                int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
 		                if (choice == JOptionPane.YES_OPTION) {
-		                    cardLayout.show(mainPanel, "chatPanel");
-		                    welcomeSendMessage();
+							try {
+								SelectReqDto selectReqDto = new SelectReqDto(selectedRoom);
+		        			    String selectReqDtoJson = gson.toJson(selectReqDto);
+		        			    RequestDto requestDto = new RequestDto("selectChatRoom", selectReqDtoJson);
+		        			    String requestDtoJson = gson.toJson(requestDto);	
+		        			    OutputStream outputStream;
+								outputStream = socket.getOutputStream();
+								PrintWriter out = new PrintWriter(outputStream,true);
+		        			    out.println(requestDtoJson);
+			                    cardLayout.show(mainPanel, "chatPanel");
+			                    welcomeSendMessage();
+							} catch (IOException e1) {
+								// TODO Auto-generated catch block
+								e1.printStackTrace();
+							}
+	        			    
 		                } else {
 		                    // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
 		                }
@@ -329,8 +341,6 @@ public class KakaoClient extends JFrame {
 		        }
 		    }
 		});
-
-		
 
         chPlusButton.setBounds(26, 92, 50, 50);
         chPlusButton.setIcon(chattingPlusButtonImg);
