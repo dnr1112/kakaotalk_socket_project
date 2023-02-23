@@ -20,6 +20,7 @@ import com.kakaotalk.serverDto.MessageReqDto;
 import com.kakaotalk.serverDto.MessageRespDto;
 import com.kakaotalk.serverDto.RequestDto;
 import com.kakaotalk.serverDto.ResponseDto;
+import com.kakaotalk.serverDto.SelectReqDto;
 
 import lombok.Data;
 
@@ -42,7 +43,7 @@ class ConnectedSocket extends Thread{
 	private String chattingname;
 	private String roomName;
 	private String roomOwner;
-
+	private List<String> userList;
 	
 
 	
@@ -102,9 +103,10 @@ class ConnectedSocket extends Thread{
 						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
 						roomName = createReqDto.getRoomName();
 						roomOwner = createReqDto.getUserName();
-						Room room = new Room(roomName, roomOwner);
-						room.setUserList(createReqDto.getUserList()); // userList 설정
-						this.createRoom(room);
+						Room room = new Room(roomName, roomOwner, this);
+						roomList.add(room);
+						System.out.println(roomList);
+						
 					    
 					    System.out.println(room);
 					    connectedChatting.add(roomName);
@@ -116,6 +118,7 @@ class ConnectedSocket extends Thread{
 					    
 					    
 					case "selectChatRoom" :
+						
 						
 						
 						

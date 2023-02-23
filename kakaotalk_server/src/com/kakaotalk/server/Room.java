@@ -6,15 +6,17 @@ import java.util.List;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@AllArgsConstructor
 @Data
 public class Room {
     private String roomName;
     private String roomOwner;
-    private List<String> userList;
+    private List<ConnectedSocket> userList = new ArrayList<>();
 
-    public Room(String roomName, String roomOwner) {
-        this(roomName, roomOwner, new ArrayList<>());
-        this.userList.add(roomOwner);
+    public Room(String roomName, String roomOwner, ConnectedSocket selectUser) {
+    	this.roomName = roomName;
+    	this.roomOwner = roomOwner;
+    	userList.add(selectUser);
     }
+    
+    
 }
