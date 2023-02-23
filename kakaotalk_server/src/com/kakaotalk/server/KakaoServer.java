@@ -21,13 +21,14 @@ import com.kakaotalk.serverDto.MessageRespDto;
 import com.kakaotalk.serverDto.RequestDto;
 import com.kakaotalk.serverDto.ResponseDto;
 import com.kakaotalk.serverDto.SelectReqDto;
+import com.kakaotalk.serverDto.SelectRespDto;
 
 import lombok.Data;
 
 @Data
 class ConnectedSocket extends Thread{
-	private static List<ConnectedSocket> socketListUsers = new ArrayList<>();
-	private static List<String> connectedChatting = new ArrayList<>();
+	private static List<ConnectedSocket> socketList = new ArrayList<>();
+	private static List<String> selectedChatting = new ArrayList<>();
 	private static List<Room> roomList = new ArrayList<>();
 	private static List<String> roomNames = new ArrayList<>();
 
@@ -40,18 +41,17 @@ class ConnectedSocket extends Thread{
 	private Gson gson;
 	
 	private String username;
-	private String chattingname;
 	private String roomName;
+	private String chattingRoomName;
 	private String roomOwner;
-	private List<String> userList;
+	private List<String> userList ;
 	
 
 	
 	public ConnectedSocket(Socket socket) {
 		this.socket = socket;
 		gson = new Gson(); // gson 생성
-		socketListUsers.add(this);
-		//socketListCreate.add(this);
+		socketList.add(this);
 	}
 	
 	
@@ -74,54 +74,48 @@ class ConnectedSocket extends Thread{
 						JoinReqDto joinReqDto = gson.fromJson(requestDto.getBody(), JoinReqDto.class);
 						username = joinReqDto.getUsername();
 						List<String> connectedUsers = new ArrayList<>();
-						for(ConnectedSocket connectedSocket : socketListUsers) {
+						for(ConnectedSocket connectedSocket : socketList) {
 						connectedUsers.add(connectedSocket.getUsername());
 						}
-						//System.out.println("connectedUsers: " + connectedUsers);
-						//System.out.println("UserCounts: " + connectedUsers.size());
 						JoinRespDto joinRespDto = new JoinRespDto(connectedUsers);
-						
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
-						CreateRespDto createRespDto1 = new CreateRespDto(connectedChatting);
+						CreateRespDto createRespDto1 = new CreateRespDto(selectedChatting);
 		                sendToAll("create", "ok",gson.toJson(createRespDto1));
 						break;
-						
-//					case "create" : 
-//						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
-//						chattingname = createReqDto.getCreateRoom();
-//						
-//						connectedChatting.add(chattingname);
-//						//room = new Room(roomName, roomOwner, userList);
-//						//System.out.println(room);
-//						CreateRespDto createRespDto2 = new CreateRespDto(connectedChatting);
-//						sendToAll(requestDto.getResource(), "ok",gson.toJson(createRespDto2));
-//						break;
-						
-						
 						
 					case "create":
 						CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
 						roomName = createReqDto.getRoomName();
 						roomOwner = createReqDto.getUserName();
 						Room room = new Room(roomName, roomOwner, this);
+						roomList = new ArrayList<>();
 						roomList.add(room);
-						System.out.println(roomList);
-						
-					    
-					    System.out.println(room);
-					    connectedChatting.add(roomName);
-					    CreateRespDto createRespDto = new CreateRespDto(connectedChatting);
+						System.out.println(roomName);
+						System.out.println(roomOwner);
+					    System.out.println(roomList);
+					    roomNames.add(roomName);
+					    CreateRespDto createRespDto = new CreateRespDto(roomNames);
 					    sendToAll("create", "ok", gson.toJson(createRespDto));
 					    break;	
 					    
 					    
-					    
-					    
-					case "selectChatRoom" :
-						
-						
-						
-						
+					case "selectChatRoom":
+					    SelectReqDto selectReqDto = gson.fromJson(requestDto.getBody(), SelectReqDto.class);
+					    chattingRoomName = selectReqDto.getSelectUser();
+					    selectedChatting.add(chattingRoomName);
+					    Room selectedRoom = Room.findRoomByName(roomList, chattingRoomName);
+					    if (selectedRoom != null) {
+					    	System.out.println(this);
+					        selectedRoom.addUser(this);
+					        userList = new ArrayList<>();
+					        userList.add(username);
+					        SelectRespDto selectRespDto = new SelectRespDto();
+					        selectRespDto.setSelectedUserList(selectedChatting);
+					        sendToAll("selectChatRoom", "ok", gson.toJson(selectRespDto));
+					    } else {
+					        sendToAll("selectChatRoom", "error", "Failed to find the room.");
+					    }
+					    break;
 						
 						
 								
@@ -159,7 +153,7 @@ class ConnectedSocket extends Thread{
 	
 	private void sendToAll(String resource,String status,String body) throws IOException {
 		ResponseDto responseDto = new ResponseDto(resource, status, body);
-		for(ConnectedSocket connectedSocket : socketListUsers) {
+		for(ConnectedSocket connectedSocket : socketList) {
 			OutputStream outputStream = connectedSocket.getSocket().getOutputStream();
 			PrintWriter out = new PrintWriter(outputStream,true);
 			

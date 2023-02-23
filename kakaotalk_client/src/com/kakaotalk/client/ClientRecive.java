@@ -10,6 +10,7 @@ import com.kakaotalk.clientDto.CreateRespDto;
 import com.kakaotalk.clientDto.JoinRespDto;
 import com.kakaotalk.clientDto.MessageRespDto;
 import com.kakaotalk.clientDto.ResponseDto;
+import com.kakaotalk.clientDto.SelectRespDto;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,9 +51,15 @@ public class ClientRecive extends Thread {
 							    CreateRespDto createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
 								KakaoClient.getInstance().getChattingListModel().clear();
 								KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅방 목록 ---");
-								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getConnectedRooms());
+								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getCreatedRooms());
 								System.out.println(createRespDto);
 								//KakaoClient.getInstance().getChattingList().setSelectedIndex(0);
+								break;
+								
+						case "selectChatRoom" :
+								SelectRespDto selectRespDto = gson.fromJson(responseDto.getBody(), SelectRespDto.class);
+								System.out.println(selectRespDto);
+							
 								break;
 						case "sendMessage" :
 								MessageRespDto messageRespDto = gson.fromJson(responseDto.getBody(),MessageRespDto.class);
