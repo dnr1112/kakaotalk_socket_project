@@ -31,7 +31,7 @@ class ConnectedSocket extends Thread{
 	private static List<String> selectedChatting = new ArrayList<>();
 	private static List<Room> roomList = new ArrayList<>();
 	private static List<String> roomNames = new ArrayList<>();
-	private static List<String> userList ;
+	private static List<String> userList = new ArrayList<>();;
 	private Socket socket;
 	
 	
@@ -98,12 +98,12 @@ class ConnectedSocket extends Thread{
 					    System.out.println("createReqDto2: "+createReqDto2);
 					    roomName = createReqDto2.getRoomName();
 					    roomOwner = createReqDto2.getUserName();
-					    List<String> userList = new ArrayList<>();
+					    //List<String> userList = new ArrayList<>();
 					    if (joinRespDto != null) {
 					        userList = joinRespDto.getConnectedUsers(); // joinRespDto에서 유저 이름 목록을 가져옵니다
 					    }
 					    System.out.println(userList);
-					    userList.add(roomOwner); // 방을 생성한 유저도 유저 목록에 추가합니다
+					    //userList.add(roomOwner); // 방을 생성한 유저도 유저 목록에 추가합니다
 					    Room room = new Room(roomName, roomOwner, this);
 					    roomList = new ArrayList<>();
 					    roomList.add(room);
@@ -167,7 +167,6 @@ class ConnectedSocket extends Thread{
 		
 			
 		}catch (IOException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		
@@ -238,14 +237,12 @@ public class KakaoServer {
 					connectedSocket.start();
 				}
 		} catch (IOException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}finally {
 			if(serverSocket != null) {
 				try {
 					serverSocket.close();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
