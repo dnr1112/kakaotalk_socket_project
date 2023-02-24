@@ -87,33 +87,36 @@ class ConnectedSocket extends Thread{
 						joinRespDto = new JoinRespDto(connectedUsers);
 						//System.out.println(joinRespDto);
 						sendToAll(requestDto.getResource(), "ok",gson.toJson(joinRespDto));
-						CreateRespDto createRespDto1 = new CreateRespDto(roomNames);
-		                sendToAll("create", "ok",gson.toJson(createRespDto1));
+						CreateRespDto createRespDto2 = new CreateRespDto(roomNames);
+		                sendToAll("create", "ok",gson.toJson(createRespDto2));
+		                //CreateReqDto createReqDto2 = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
+//		                System.out.println("joinRespDto: "+joinRespDto);
+					    //createReqDto2.setUserList(connectedUsers);
+					    //System.out.println("createReqDto2: "+createReqDto2);
 						break;
 
 						
 					case "create":
-					    CreateReqDto createReqDto2 = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
-					    System.out.println("joinRespDto: "+joinRespDto);
-					    System.out.println("createReqDto2: "+createReqDto2);
-					    roomName = createReqDto2.getRoomName();
-					    roomOwner = createReqDto2.getUserName();
+					    CreateReqDto createReqDto = gson.fromJson(requestDto.getBody(), CreateReqDto.class);
+					    //System.out.println("createReqDto: "+createReqDto);
+					    roomName = createReqDto.getRoomName();
+					    roomOwner = createReqDto.getUserName();
 					    //List<String> userList = new ArrayList<>();
-					    if (joinRespDto != null) {
-					        userList = joinRespDto.getConnectedUsers(); // joinRespDto에서 유저 이름 목록을 가져옵니다
-					    }
-					    System.out.println(userList);
+//					    if (joinRespDto != null) {
+//					        userList = joinRespDto.getConnectedUsers(); // joinRespDto에서 유저 이름 목록을 가져옵니다
+//					    }
+//					    System.out.println(userList);
 					    //userList.add(roomOwner); // 방을 생성한 유저도 유저 목록에 추가합니다
 					    Room room = new Room(roomName, roomOwner, this);
 					    roomList = new ArrayList<>();
 					    roomList.add(room);
-					    //System.out.println("createReqDto: "+createReqDto2);
-					    //System.out.println("roomName: "+roomName);
-					    //System.out.println("roomOwner: "+roomOwner);
-					    //System.out.println("roomList: "+roomList);
+					    System.out.println("createReqDto: "+createReqDto);
+					    System.out.println("roomName: "+roomName);
+					    System.out.println("roomOwner: "+roomOwner);
+					    System.out.println("roomList: "+roomList);
 					    roomNames.add(roomName);
-					    //System.out.println("roomNames: "+roomNames);
-					    //System.out.println("this: "+this);
+					    System.out.println("roomNames: "+roomNames);
+					    System.out.println("this: "+this);
 					    CreateRespDto createRespDto = new CreateRespDto(roomNames);
 					    sendToAll("create", "ok", gson.toJson(createRespDto));
 					    break;
