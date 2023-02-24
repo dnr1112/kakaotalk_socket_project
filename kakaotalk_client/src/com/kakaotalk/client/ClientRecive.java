@@ -1,4 +1,5 @@
 package com.kakaotalk.client;
+import java.awt.Container;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -22,6 +23,7 @@ public class ClientRecive extends Thread {
 	private final Socket socket;
 	private InputStream inputStream;
 	private Gson gson;
+	
 
 
 		 @Override
@@ -44,20 +46,25 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getUserListModel().clear();
 								KakaoClient.getInstance().getUserListModel().addElement("접속 유저 현황"+"("+joinRespDto.getConnectedUsers().size()+"명)");
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
+								KakaoClient.getInstance().getCardLayout().show(KakaoClient.getInstance().getMainPanel(), "createPanel");
+								System.out.println(KakaoClient.getInstance().getMainPanel());
+								
 								//System.out.println(joinRespDto);
 								break;
 					
-						case "create" :
-							    CreateRespDto createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
-								KakaoClient.getInstance().getChattingListModel().clear();
-								KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅방 목록 ---");
-								KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getCreatedRooms());
-								//System.out.println(createRespDto);
-								//KakaoClient.getInstance().getChattingList().setSelectedIndex(0);
-								break;
+						case "create":
+						    	CreateRespDto createRespDto = gson.fromJson(responseDto.getBody(), CreateRespDto.class);
+						    	if (createRespDto.getCreatedRooms() != null) {
+						        KakaoClient.getInstance().getChattingListModel().clear();
+						        KakaoClient.getInstance().getChattingListModel().addElement("--- 채팅방 목록 ---");
+						        KakaoClient.getInstance().getChattingListModel().addAll(createRespDto.getCreatedRooms());
+						        //KakaoClient.getInstance().getChattingList().setSelectedIndex(0);
+						    }
+						    break;
 								
 						case "selectChatRoom" :
 								SelectRespDto selectRespDto = gson.fromJson(responseDto.getBody(), SelectRespDto.class);
+								//KakaoClient.getInstance().getTitleLabel().add(selectRespDto);
 								System.out.println(selectRespDto);
 							
 								break;

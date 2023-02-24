@@ -45,6 +45,8 @@ class ConnectedSocket extends Thread{
 	private String chattingRoomName;
 	private String roomOwner;
 	
+
+	
 	private JoinRespDto joinRespDto = new JoinRespDto();
 	
 	public ConnectedSocket(Socket socket) {
@@ -108,15 +110,15 @@ class ConnectedSocket extends Thread{
 //					    System.out.println(userList);
 					    //userList.add(roomOwner); // 방을 생성한 유저도 유저 목록에 추가합니다
 					    Room room = new Room(roomName, roomOwner, this);
-					    roomList = new ArrayList<>();
 					    roomList.add(room);
-					    System.out.println("createReqDto: "+createReqDto);
-					    System.out.println("roomName: "+roomName);
-					    System.out.println("roomOwner: "+roomOwner);
-					    System.out.println("roomList: "+roomList);
+//					    System.out.println("createReqDto: "+createReqDto);
+//					    System.out.println("roomName: "+roomName);
+//					    System.out.println("roomOwner: "+roomOwner);
+//					    System.out.println("roomList: "+roomList);
 					    roomNames.add(roomName);
-					    System.out.println("roomNames: "+roomNames);
-					    System.out.println("this: "+this);
+//					    System.out.println("roomNames: "+roomNames);
+//					    System.out.println("this: "+this);
+					    
 					    CreateRespDto createRespDto = new CreateRespDto(roomNames);
 					    sendToAll("create", "ok", gson.toJson(createRespDto));
 					    break;
@@ -124,20 +126,20 @@ class ConnectedSocket extends Thread{
 					    
 					case "selectChatRoom":
 					    SelectReqDto selectReqDto = gson.fromJson(requestDto.getBody(), SelectReqDto.class);
-					    chattingRoomName = selectReqDto.getSelectUser();
-					    selectedChatting.add(chattingRoomName);
-					    Room selectedRoom = Room.findRoomByName(roomList, chattingRoomName);
-					    if (selectedRoom != null) {
-					    	System.out.println(this);
-					        selectedRoom.addUser(this);
-					        userList = new ArrayList<>();
-					        userList.add(username);
-					        SelectRespDto selectRespDto = new SelectRespDto();
-					        selectRespDto.setSelectedUserList(selectedChatting);
-					        sendToAll("selectChatRoom", "ok", gson.toJson(selectRespDto));
-					    } else {
-					       
+					    chattingRoomName = selectReqDto.getSelectedRoom();
+					    System.out.println(chattingRoomName);
+					    for (Room room1 : roomList) {
+			
+					    	if(room1.getRoomName().equals(chattingRoomName)) {
+					    		room1.getUserList().add(this);
+					    		System.out.println("room: "+ room1);
+					    	}
 					    }
+					    
+					    SelectRespDto selectRespDto = new SelectRespDto();
+					    System.out.println("selectReqDto: " + selectReqDto);
+					    sendToAll("create", "ok", gson.toJson(selectRespDto));
+					    
 					    break;
 						
 						
@@ -188,27 +190,7 @@ class ConnectedSocket extends Thread{
 		}
 	}
 	
-	private synchronized void createRoom(Room room) {
-        roomList.add(room);   // 방 목록에 추가
-        System.out.println(room.getRoomName() + "방 생성");
-    }
-    
-	private synchronized List<String> getRoomList() {
-       
-        for (Room room : roomList) {
-        	roomNames.add(room.getRoomName());
-        }
-        return roomNames;
-    }
-    
-	private synchronized Room getRoomByName(String roomName) {
-        for (Room room : roomList) {
-            if (room.getRoomName().equals(roomName)) {
-                return room;
-            }
-        }
-        return null;
-    }
+
 	
 //	private void sendToUser(String resouce, String status, String body, String toUser) throws IOException {
 //		
