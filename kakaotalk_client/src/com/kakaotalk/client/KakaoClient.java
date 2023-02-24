@@ -281,7 +281,7 @@ public class KakaoClient extends JFrame {
 
         			   titleLabel.setText("방 제목: " + createroom);
         			   List<String> userList = new ArrayList<>();
-        			   userList.add(username);
+        			   //userList.add(username);
         		       CreateReqDto createReqDto = new CreateReqDto(createroom,username,userList);
         			   String createReqDtoJson = gson.toJson(createReqDto);
         			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
