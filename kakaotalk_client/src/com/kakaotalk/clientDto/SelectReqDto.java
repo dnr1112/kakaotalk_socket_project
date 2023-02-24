@@ -7,5 +7,5 @@ import lombok.Data;
 @Data
 public class SelectReqDto {
 
-	private String selectUser;
+	private String selectedRoom;
 }

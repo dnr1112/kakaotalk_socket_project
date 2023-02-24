@@ -57,7 +57,7 @@ public class KakaoClient extends JFrame {
 				try {
 					instance = new KakaoClient();
 				} catch (IOException e) {
-					// TODO Auto-generated catch block
+
 					e.printStackTrace();
 				}
 		}
@@ -73,6 +73,7 @@ public class KakaoClient extends JFrame {
 	
     
     private static final long serialVersionUID = 1L;
+    private JPanel mainPanel;
     private JPanel loginPanel;
     private JPanel createPanel;
     private JPanel chatPanel;
@@ -84,7 +85,7 @@ public class KakaoClient extends JFrame {
     
     private JTextArea contentView;
     
-    private JList<String> userList;
+    private JList<String> userList ;
     private DefaultListModel<String> userListModel;
     private JList<String> chattingList;
 	private DefaultListModel<String> chattingListModel;
@@ -128,7 +129,7 @@ public class KakaoClient extends JFrame {
    
         
         // 커스텀 JPanel 클래스를 생성합니다.
-        JPanel mainPanel = new JPanel() {
+        	JPanel mainPanel = new JPanel() {
             private static final long serialVersionUID = 1L;
             
             @Override
@@ -236,7 +237,7 @@ public class KakaoClient extends JFrame {
 					ClientRecive clientRecive = new ClientRecive(socket);
 					clientRecive.start();
 	           
-	                cardLayout.show(mainPanel, "createPanel");
+	                //cardLayout.show(mainPanel, "createPanel");
 	                
 	                JoinReqDto joinReqDto = new JoinReqDto(username);
 					String joinReqDtoJson = gson.toJson(joinReqDto);
@@ -281,7 +282,7 @@ public class KakaoClient extends JFrame {
 
         			   titleLabel.setText("방 제목: " + createroom);
         			   List<String> userList = new ArrayList<>();
-        			   //userList.add(username);
+        			   userList.add(username);
         		       CreateReqDto createReqDto = new CreateReqDto(createroom,username,userList);
         			   String createReqDtoJson = gson.toJson(createReqDto);
         			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
@@ -311,36 +312,31 @@ public class KakaoClient extends JFrame {
 		
 		chattingList.addMouseListener(new MouseAdapter() {
 		    public void mouseClicked(MouseEvent e) {
-		        int selectedIdx = chattingList.getSelectedIndex();
-		       System.out.println(selectedIdx);
-		        if (selectedIdx >= 0) {  // 수정된 부분
-		            String selectedRoom = (String) chattingList.getModel().getElementAt(selectedIdx);
-		            if (!selectedRoom.equals("--- 채팅방 목록 ---")) {
-		                int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
-		                if (choice == JOptionPane.YES_OPTION) {
-							try {
-								SelectReqDto selectReqDto = new SelectReqDto(selectedRoom);
-		        			    String selectReqDtoJson = gson.toJson(selectReqDto);
-		        			    RequestDto requestDto = new RequestDto("selectChatRoom", selectReqDtoJson);
-		        			    String requestDtoJson = gson.toJson(requestDto);	
-		        			    OutputStream outputStream;
-								outputStream = socket.getOutputStream();
-								PrintWriter out = new PrintWriter(outputStream,true);
-		        			    out.println(requestDtoJson);
-			                    cardLayout.show(mainPanel, "chatPanel");
-			                    welcomeSendMessage();
-							} catch (IOException e1) {
-								// TODO Auto-generated catch block
-								e1.printStackTrace();
-							}
-	        			    
+		        String selectedRoom = chattingList.getSelectedValue();
+		        if (selectedRoom != null && !selectedRoom.equals("--- 채팅방 목록 ---")) {
+		            int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
+		            if (choice == JOptionPane.YES_OPTION) {
+		                    SelectReqDto selectReqDto = new SelectReqDto(selectedRoom);
+		                    String selectReqDtoJson = gson.toJson(selectReqDto);
+		                    RequestDto requestDto = new RequestDto("selectChatRoom", selectReqDtoJson);
+		                    String requestDtoJson = gson.toJson(requestDto);
+		                    OutputStream outputStream;
+		                    try {
+		                        outputStream = socket.getOutputStream();
+		                        PrintWriter out = new PrintWriter(outputStream, true);
+		                        out.println(requestDtoJson);
+		                    } catch (IOException e1) {
+		                        e1.printStackTrace();
+		                    }
+		                    cardLayout.show(mainPanel, "chatPanel");
+		                    welcomeSendMessage();
 		                } else {
-		                    // No를 선택한 경우 아무런 작업도 수행하지 않습니다.
-		                }
+		                    // No를 선택한 경우 아무런 작업도 수행하지 않습니다. 
 		            }
 		        }
 		    }
 		});
+
 
         chPlusButton.setBounds(26, 92, 50, 50);
         chPlusButton.setIcon(chattingPlusButtonImg);
