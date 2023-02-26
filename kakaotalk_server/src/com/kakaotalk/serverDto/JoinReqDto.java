@@ -9,5 +9,7 @@ public class JoinReqDto {
 	
 	private String username;
 	
+	
+	
 
 }

@@ -1,7 +1,5 @@
 package com.kakaotalk.clientDto;
 
-
-
 import java.util.ArrayList;
 import java.util.List;
 

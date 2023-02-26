@@ -11,7 +11,7 @@ import lombok.Data;
 public class SelectRespDto {
     private List<String> selectedUserList;
     
-    public SelectRespDto() {
-        selectedUserList = new ArrayList<>();
-    }
+//    public SelectRespDto() {
+//        selectedUserList = new ArrayList<>();
+//    }
 }

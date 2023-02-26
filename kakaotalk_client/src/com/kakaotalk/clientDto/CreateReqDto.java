@@ -1,26 +1,28 @@
 package com.kakaotalk.clientDto;
 
+import java.util.ArrayList;
 import java.util.List;
 
-import lombok.AllArgsConstructor;
 import lombok.Data;
 
-@AllArgsConstructor
 @Data
+
 public class CreateReqDto {
     private String roomName;
     private String userName;
     private List<String> userList;
-    
-    public String getRoomName() {
-        return roomName;
+
+    public CreateReqDto(String roomName, String userName) {
+        this(roomName, userName, new ArrayList<>());
     }
-    
-    public String getUserName() {
-        return userName;
+
+    public CreateReqDto(String roomName, String userName, List<String> userList) {
+        this.roomName = roomName;
+        this.userName = userName;
+        this.userList = userList;
     }
-    
-    public List<String> getUserList() {
-        return userList;
+
+    public void addUser(String user) {
+        this.userList.add(user);
     }
 }

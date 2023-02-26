@@ -85,10 +85,11 @@ public class KakaoClient extends JFrame {
     
     private JTextArea contentView;
     
-    private JList<String> userList ;
+    private JList<String> jUserList ;
     private DefaultListModel<String> userListModel;
-    private JList<String> chattingList;
+    private JList<String> jChattingList;
 	private DefaultListModel<String> chattingListModel;
+	private List<String> userList = new ArrayList<>();
     
     
     
@@ -237,7 +238,7 @@ public class KakaoClient extends JFrame {
 					ClientRecive clientRecive = new ClientRecive(socket);
 					clientRecive.start();
 	           
-	                //cardLayout.show(mainPanel, "createPanel");
+	                cardLayout.show(mainPanel, "createPanel");
 	                
 	                JoinReqDto joinReqDto = new JoinReqDto(username);
 					String joinReqDtoJson = gson.toJson(joinReqDto);
@@ -267,30 +268,29 @@ public class KakaoClient extends JFrame {
         
         JButton chPlusButton = new JButton();
         chPlusButton.addMouseListener(new MouseAdapter() {
-        	@Override
-        	public void mouseClicked(MouseEvent e) {
-        		try {
-        			   createroom =JOptionPane.showInputDialog(null,
-        					   "방의 제목을 입력하시오.","방 생성",
-        					   JOptionPane.INFORMATION_MESSAGE);
-        			   if (createroom == null || createroom.trim().isEmpty()) {
-        				    throw new IllegalArgumentException("방 제목을 입력하세요.");
-        				} else if (createroom.matches("^\\s+$")) {
-        				    throw new IllegalArgumentException("방 제목은 공백으로만 이루어질 수 없습니다.");
-        				}
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                try {
+                    createroom = JOptionPane.showInputDialog(null,
+                            "방의 제목을 입력하시오.", "방 생성",
+                            JOptionPane.INFORMATION_MESSAGE);
+                    if (createroom == null || createroom.trim().isEmpty()) {
+                        throw new IllegalArgumentException("방 제목을 입력하세요.");
+                    } else if (createroom.matches("^\\s+$")) {
+                        throw new IllegalArgumentException("방 제목은 공백으로만 이루어질 수 없습니다.");
+                    }
 
-
-        			   titleLabel.setText("방 제목: " + createroom);
-        			   List<String> userList = new ArrayList<>();
-        			   userList.add(username);
-        		       CreateReqDto createReqDto = new CreateReqDto(createroom,username,userList);
-        			   String createReqDtoJson = gson.toJson(createReqDto);
-        			   RequestDto requestDto = new RequestDto("create", createReqDtoJson);
-        			   String requestDtoJson = gson.toJson(requestDto);	
-        			   OutputStream outputStream = socket.getOutputStream();
-        			   PrintWriter out = new PrintWriter(outputStream,true);
-        			   out.println(requestDtoJson);
-        		} catch (IllegalArgumentException e1) {
+                    titleLabel.setText("방 제목: " + createroom);
+                    CreateReqDto createReqDto = new CreateReqDto(createroom, username);
+                   // System.out.println(createReqDto);
+                    String createReqDtoJson = gson.toJson(createReqDto);
+                    RequestDto requestDto = new RequestDto("create", createReqDtoJson);
+                    String requestDtoJson = gson.toJson(requestDto);
+                    OutputStream outputStream = socket.getOutputStream();
+                    PrintWriter out = new PrintWriter(outputStream, true);
+                    out.println(requestDtoJson);
+                    //System.out.println(requestDtoJson);
+                } catch (IllegalArgumentException e1) {
                     JOptionPane.showMessageDialog(null,
                             e1.getMessage(), "입력 오류",
                             JOptionPane.ERROR_MESSAGE);
@@ -305,14 +305,14 @@ public class KakaoClient extends JFrame {
         
         
         chattingListModel = new DefaultListModel<>();
-        chattingList = new JList<String>(chattingListModel);
-		chattingListScroll.setViewportView(chattingList); 
+        jChattingList = new JList<String>(chattingListModel);
+		chattingListScroll.setViewportView(jChattingList); 
 		
 		
 		
-		chattingList.addMouseListener(new MouseAdapter() {
+		jChattingList.addMouseListener(new MouseAdapter() {
 		    public void mouseClicked(MouseEvent e) {
-		        String selectedRoom = chattingList.getSelectedValue();
+		        String selectedRoom = jChattingList.getSelectedValue();
 		        if (selectedRoom != null && !selectedRoom.equals("--- 채팅방 목록 ---")) {
 		            int choice = JOptionPane.showConfirmDialog(null, "채팅방에 입장하시겠습니까?", "입장 알림", JOptionPane.YES_NO_OPTION);
 		            if (choice == JOptionPane.YES_OPTION) {
@@ -351,8 +351,8 @@ public class KakaoClient extends JFrame {
         
         
         userListModel = new DefaultListModel<>();
-		userList = new JList<String>(userListModel);
-		userListScroll.setViewportView(userList);
+        jUserList = new JList<String>(userListModel);
+		userListScroll.setViewportView(jUserList);
         
      
         mainPanel.add(chatPanel, "chatPanel");
