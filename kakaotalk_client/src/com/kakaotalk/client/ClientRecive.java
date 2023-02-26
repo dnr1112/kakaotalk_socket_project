@@ -46,8 +46,8 @@ public class ClientRecive extends Thread {
 								KakaoClient.getInstance().getUserListModel().clear();
 								KakaoClient.getInstance().getUserListModel().addElement("접속 유저 현황"+"("+joinRespDto.getConnectedUsers().size()+"명)");
 								KakaoClient.getInstance().getUserListModel().addAll(joinRespDto.getConnectedUsers());
-								KakaoClient.getInstance().getCardLayout().show(KakaoClient.getInstance().getMainPanel(), "createPanel");
-								System.out.println(KakaoClient.getInstance().getMainPanel());
+								//KakaoClient.getInstance().getCardLayout().show(KakaoClient.getInstance().getMainPanel(), "createPanel");
+								//System.out.println(KakaoClient.getInstance().getMainPanel());
 								
 								//System.out.println(joinRespDto);
 								break;
